@@ -1,0 +1,6 @@
+# References {.unnumbered}
+
+Primary sources are cited at the point where their results are used. Daley's review supplies the historical and scientific backbone; it is also the starting point for tracing the broader literature.
+
+::: {#refs}
+:::

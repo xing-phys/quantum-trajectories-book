@@ -1,0 +1,100 @@
+project:
+  type: book
+  output-dir: _site
+  resources:
+    - scripts/trajectories.jl
+    - scripts/make_figures.py
+    - Project.toml
+    - LICENSE
+
+book:
+  title: "Quantum Trajectories and Open Many-Body Dynamics"
+  subtitle: "A self-contained companion to Daley's 2014 review"
+  author:
+    - name: Ze-Yu Xing
+      orcid: 0009-0009-5655-0187
+      affiliations:
+        - Institute of Physics, Chinese Academy of Sciences
+        - University of Chinese Academy of Sciences
+  date: "2026-10-20"
+  date-format: long
+  site-url: https://xing-phys.github.io/quantum-trajectories-book/
+  repo-url: https://github.com/xing-phys/quantum-trajectories-book
+  repo-actions: [edit, issue]
+  output-file: quantum-trajectories-book
+  search: true
+  downloads: [pdf]
+  sidebar:
+    style: docked
+    collapse-level: 1
+    title: "Quantum Trajectories"
+  chapters:
+    - index.qmd
+    - part: "Foundations and trajectories"
+      chapters:
+        - 01-foundations.qmd
+        - 02-master-equations.qmd
+        - 03-quantum-trajectories.qmd
+        - 04-measurement.qmd
+        - 05-worked-examples.qmd
+    - part: "Many-body physics"
+      chapters:
+        - 06-many-body-numerics.qmd
+        - 07-microscopic-models.qmd
+        - 08-light-scattering.qmd
+        - 09-particle-loss.qmd
+        - 10-reservoir-engineering.qmd
+        - 11-connections-outlook.qmd
+    - part: "Practice"
+      chapters:
+        - 12-computational-lab.qmd
+    - references.qmd
+  appendices:
+    - notation.qmd
+    - review-map.qmd
+  page-footer:
+    left: "Original study text · CC BY 4.0 · Code MIT"
+    right: "Built with Quarto"
+
+bibliography:
+  - assets/bibliography.bib
+  - applications.bib
+  - numerics.bib
+csl: assets/american-physics-society.csl
+link-citations: true
+lang: en
+
+format:
+  html:
+    theme:
+      light: [cosmo, assets/theme-light.scss]
+      dark: [darkly, assets/theme-dark.scss]
+    css: assets/styles.css
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    fig-responsive: true
+    code-copy: true
+    code-overflow: wrap
+    include-in-header: assets/mathjax-config.html
+    reference-location: document
+  pdf:
+    documentclass: scrbook
+    pdf-engine: lualatex
+    papersize: a4
+    geometry:
+      - margin=25mm
+    fontsize: 11pt
+    colorlinks: true
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    include-in-header:
+      - assets/macros.sty
+      - text: |
+          \usepackage{microtype}
+          \emergencystretch=3em
+    keep-tex: false
+    reference-location: document
+execute:
+  enabled: false

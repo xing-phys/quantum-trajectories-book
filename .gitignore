@@ -1,0 +1,16 @@
+/.quarto/
+/_site/
+/.research/
+/.venv/
+/tmp/
+/output/
+*.quarto_ipynb
+__pycache__/
+*.pyc
+*.log
+*.aux
+*.toc
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz

@@ -1,0 +1,51 @@
+---
+title: "Welcome"
+---
+
+## A route from wavefunctions to open many-body physics {.unnumbered}
+
+A photon leaves an atom. A molecule disappears from a lattice site. A detector remains silent. Each event changes what we can predict about a quantum system. Quantum trajectories describe this conditional evolution, while a master equation describes the average over records. In a many-body system, these two descriptions connect microscopic measurement to correlations, entanglement, heating, and the deliberate preparation of quantum matter.
+
+This book develops that connection for readers who know undergraduate quantum mechanics and want to begin research in open quantum systems. It follows the scientific scope of Andrew J. Daley's review, *Quantum trajectories and open many-body quantum systems* [@Daley2014], but supplies an independent teaching text: prerequisites, intermediate algebra, worked examples, original illustrations, exercises with guidance, and runnable Julia calculations.
+
+::: {.callout-note title="How this book relates to the review"}
+The backbone is the 2014 review, available as [arXiv:1405.6694](https://arxiv.org/abs/1405.6694) and in *Advances in Physics*, **63**, 77–149. This is an independently written companion, with its own organization and derivations. The [coverage map](review-map.qmd) connects every scientific section and subsection of the review to the corresponding chapters. The historical examples retain their original status as proposals, calculations, or experiments; the outlook explains what must be checked before extending them.
+:::
+
+## What you will learn {.unnumbered}
+
+The first part begins with density operators and partial traces, derives a Markovian master equation, and constructs the quantum-jump method from measurement operators. It then explains waiting-time sampling, uncertainty estimates, two-time correlations, and the relation between photon counting and continuous measurement. Two-level resonance fluorescence and hard-core boson dephasing give concrete examples.
+
+The second part introduces exact propagation, product-state methods, and matrix product states before developing microscopic models for cold atoms. Light scattering, one-, two-, and three-body loss, and the continuous quantum Zeno effect show how the same formalism gives very different many-body dynamics. Reservoir engineering then turns dissipation into a tool for cooling and state preparation. Connections to Rydberg atoms, cavities, clocks, ions, and other platforms place these examples in context.
+
+The computational laboratory supplies an executable bridge between the equations and numerical evidence. It separates stochastic sampling error from time discretization and Hilbert-space truncation, and compares trajectories with direct master-equation evolution.
+
+## Preparation and reading routes {.unnumbered}
+
+You should be comfortable with complex vectors, eigenvalues, the Schrödinger equation, two-level systems, and elementary probability. The opening chapter develops density matrices and second quantization as needed. The [notation appendix](notation.qmd) collects conventions and a short mathematical toolkit; it can be read alongside the main text.
+
+| Goal | Reading route |
+|:--|:--|
+| First encounter with open systems | Read Chapters 1–5 in order, working the short exercises. |
+| Implement reliable quantum jumps | Read Chapters 2–3, then the computational laboratory; return to measurement for interpretation. |
+| Understand dissipative cold atoms | Read Chapters 1–3, microscopic models, scattering, and loss. |
+| Combine trajectories with tensor networks | Read trajectories, many-body numerics, then the laboratory. |
+| Study engineered dissipation | Read master equations, measurement, microscopic models, and reservoir engineering. |
+
+Derivations use $\hbar=1$ unless a dimensional expression is explicitly restored. Every jump operator includes the square root of its rate. These choices matter when comparing conventions across papers.
+
+## How to use the calculations {.unnumbered}
+
+All scientific plots are original calculations or explanatory schematics. The numerical source is version controlled with the book. Julia performs the dynamics; Python only draws the numerical figures. The laboratory gives commands and explains the numerical assumptions. Plot captions identify parameters and distinguish a stochastic realization from an ensemble average.
+
+::: {.callout-tip title="Read actively"}
+Before accepting a model, identify its bath, the physical meaning of each jump, and the approximation that removes memory. Before accepting a numerical curve, identify its time-step error, truncation error, and sampling error. Before accepting a state-preparation proposal, ask about uniqueness, the relaxation gap, and competing processes.
+:::
+
+## Sources, authorship, and reuse {.unnumbered}
+
+The bibliography gives primary papers for the central methods and representative applications, with the review as the organizing reference. Equations and explanations have been developed for this book, and no third-party paper figures are redistributed. A proposal described in a cited paper is identified as a proposal; a numerical observation is not promoted to a general theorem.
+
+This initial edition was prepared with AI assistance and checked through derivations, executable examples, and publication checks. Corrections and improvements are welcome through the repository's issue tracker.
+
+Original prose and figures are available under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); source code is under the MIT license. Citations identify work that remains under its original copyright. Build and contribution instructions are in the repository README.

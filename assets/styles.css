@@ -1,0 +1,28 @@
+/* Shared styles for the OYA-OQS report site */
+
+/* Slightly larger, clearer display equations */
+.math.display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+}
+
+/* Keep long inline formulas from breaking awkwardly */
+.math.inline {
+  white-space: nowrap;
+}
+
+/* Figure captions */
+figure.quarto-float.tbl figcaption,
+figure.quarto-float.fig figcaption {
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+/* Theorem boxes */
+div.callout {
+  border-radius: 6px;
+}
+
+/* Dark mode: SVG figures with dark backgrounds can be dimmed if needed */
+/* .quarto-dark figure svg { filter: brightness(0.85); } */
