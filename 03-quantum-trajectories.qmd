@@ -1,0 +1,244 @@
+# Quantum trajectories as a numerical method {#sec-quantum-trajectories}
+
+The Monte Carlo wavefunction method replaces one density-matrix evolution by an ensemble of stochastic state-vector evolutions. Its elementary ingredients are non-Hermitian propagation between jumps, random selection of jump times and channels, and averages of observables. The construction was developed in quantum optics through complementary numerical and measurement-based approaches [@DCM1992; @Dum1992; @Molmer1993; @Plenio1998]. We derive it before discussing its efficiency.
+
+Throughout this chapter the master equation is @eq-lindblad-master, with rate factors included in $L_m$. Time-independent notation is used for clarity; time-dependent Hamiltonians and jumps require the corresponding time-ordered propagators and instantaneous rates.
+
+## The first-order algorithm
+
+Let $|\psi\rangle$ be the normalized state at time $t$, and define
+
+$$
+r_m=\langle\psi|L_m^\dagger L_m|\psi\rangle,
+\qquad r=\sum_mr_m,
+\qquad \delta p_m=r_m\delta t.
+$$ {#eq-jump-rates}
+
+Choose $\delta t$ small enough that $r\delta t\ll1$ and that the coherent dynamics are resolved. The no-jump candidate is
+
+$$
+|\widetilde\psi_0\rangle=(I-iH_{\mathrm{eff}}\delta t)|\psi\rangle.
+$$
+
+Its squared norm is $1-r\delta t+O(\delta t^2)$. With probability $1-r\delta t$, select the normalized no-jump state. With probability $r_m\delta t$, select
+
+$$
+|\psi_m\rangle=\frac{L_m|\psi\rangle}{\sqrt{r_m}}.
+$$ {#eq-normalized-jump}
+
+A channel with $r_m=0$ is never selected. In practice draw one uniform random number to decide whether any jump occurs, then, if necessary, draw another to select a channel with probability $r_m/r$. One can equivalently partition a single unit interval into the no-jump and individual jump outcomes.
+
+If the initial density operator is mixed, sample a normalized initial state from any ensemble decomposition $\rho(0)=\sum_ap_a|\psi_a\rangle\langle\psi_a|$. Reusing one arbitrary pure state for every trajectory would solve a different initial-value problem. A spectral decomposition is convenient for a small density matrix; a physical preparation ensemble may be much cheaper for a many-body state.
+
+### Why the average obeys the master equation
+
+For a fixed input projector $P=|\psi\rangle\langle\psi|$, multiplying each normalized output projector by its probability cancels its normalization. Therefore
+
+$$
+\begin{aligned}
+\mathbb E[P(t+\delta t)\mid P(t)]
+&=P-i\delta t(H_{\mathrm{eff}}P-PH_{\mathrm{eff}}^\dagger)
++\delta t\sum_mL_mPL_m^\dagger+O(\delta t^2)\\
+&=P+\delta t\,\mathcal L(P)+O(\delta t^2).
+\end{aligned}
+$$ {#eq-trajectory-average-proof}
+
+Averaging again over earlier random outcomes gives $\rho(t)=\mathbb E[P(t)]$ and the desired master equation in the continuous-time limit. The nonlinear normalization of an individual state does not spoil the linear average because the branch probabilities supply the compensating norm factors.
+
+For $R$ independently generated trajectories, estimate an observable by
+
+$$
+\overline A(t)=\frac1R\sum_{a=1}^R
+\langle\psi_a(t)|A|\psi_a(t)\rangle.
+$$ {#eq-trajectory-observable}
+
+For a bounded observable and exact trajectory propagation, this estimator is unbiased. Finite-step propagation may introduce a systematic bias even when $R$ is enormous.
+
+### A stochastic differential form
+
+Let $dN_m$ be zero or one, with conditional mean $\mathbb E[dN_m\mid\psi]=r_mdt$. Simultaneous events in distinct channels have probability of order $dt^2$. The normalized jump equation can be written
+
+$$
+\begin{aligned}
+d|\psi\rangle={}&\left[-iH-\frac12\sum_m(L_m^\dagger L_m-r_m)\right]|\psi\rangle\,dt\\
+&+\sum_m\left(\frac{L_m}{\sqrt{r_m}}-I\right)|\psi\rangle\,dN_m.
+\end{aligned}
+$$ {#eq-counting-sse}
+
+Terms with zero rate are omitted. Between counts the scalar $r_m$ terms renormalize the state continuously; at a count the jump term replaces the state by @eq-normalized-jump. The counting increments obey $dN_m^2=dN_m$, not $dt^2$. Remembering this rule is essential when forming $d(|\psi\rangle\langle\psi|)$.
+
+## Waiting times from norm loss {#sec-event-driven}
+
+The first-order method allows at most one jump per step and assigns it a step endpoint. A more accurate coherent propagator improves one source of error but does not remove this timing approximation. An event-driven method samples the waiting time directly [@Dum1992; @Daley2014].
+
+Immediately after a jump, or at the initial time $t_0$, set $|\widetilde\psi(t_0)\rangle=|\psi(t_0)\rangle$ and propagate the *unnormalized* state according to
+
+$$
+\frac d{dt}|\widetilde\psi(t)\rangle=-iH_{\mathrm{eff}}(t)|\widetilde\psi(t)\rangle.
+$$
+
+Define its squared norm $S(t)=\langle\widetilde\psi(t)|\widetilde\psi(t)\rangle$. Then
+
+$$
+\dot S(t)=-\sum_m\langle\widetilde\psi(t)|L_m^\dagger L_m|\widetilde\psi(t)\rangle
+=-r(t)S(t),
+\qquad
+S(t)=\exp\left[-\int_{t_0}^t r(s)ds\right],
+$$ {#eq-survival-hazard}
+
+where $r(t)$ is evaluated using $|\psi(t)\rangle=|\widetilde\psi(t)\rangle/\sqrt{S(t)}$. Thus $S(t)$ is the survival probability for no jump up to time $t$, and $w(t)=-\dot S(t)$ is the next-event density.
+
+Draw $u$ uniformly from $(0,1)$ and locate the first time $t_1$ such that $S(t_1)=u$. At that time calculate the normalized pre-jump state, choose channel $m$ with probability $r_m(t_1)/r(t_1)$, apply its normalized jump, reset the norm to one, draw a fresh threshold, and continue. If no crossing occurs before the final observation time, finish the no-jump segment. If a dark component survives forever, $S(\infty)$ can be positive; thresholds below this limit correspond to no future event.
+
+A robust implementation brackets a threshold crossing with an ODE solver, then uses dense output or a bracketed root finder to locate it. The norm should be nonincreasing analytically; significant numerical norm increases signal a propagation error. For matrix-product states it is often preferable to keep the stored vector normalized and accumulate the logarithm of the survival probability separately, avoiding underflow and confusion with normalization changes introduced by compression.
+
+Observation times do not have to coincide with jump times. Evaluate the normalized no-jump solution at each requested time, then continue toward the same pending threshold. Drawing a new waiting time whenever an output is written would alter the process unless the conditional survival information is updated consistently.
+
+The waiting distribution is exponential only when the total hazard $r(t)$ is constant. In a driven atom it varies as the excited-state amplitude builds up; replacing it by an exponential with the steady mean rate destroys the short-time photon statistics.
+
+## Errors, uncertainty, and cost {#sec-trajectory-errors}
+
+There are three conceptually different errors:
+
+- **Model error:** approximations in the Hamiltonian, reservoir coupling, or Markov description.
+- **Deterministic numerical error:** finite time steps, event-location tolerance, local-basis cutoff, and state compression.
+- **Sampling error:** the finite number of random trajectories.
+
+Increasing $R$ reduces only the last. Resolve deterministic error below the statistical accuracy required for the physical conclusion, rather than interpreting small error bars as evidence of an accurate model.
+
+For a Hermitian observable, write $A_a=\langle\psi_a|A|\psi_a\rangle$. If trajectories are independent and their variance is finite,
+
+$$
+\operatorname{Var}(\overline A)=\frac{\operatorname{Var}(A_a)}R,
+\qquad
+s_A^2=\frac1{R-1}\sum_a(A_a-\overline A)^2,
+\qquad
+\operatorname{SE}(\overline A)=\frac{s_A}{\sqrt R}.
+$$ {#eq-standard-error}
+
+The standard error estimates the spread of the *mean over repeated independent ensembles*, not the spread of individual trajectories. Roughly 68% and 95% Gaussian intervals are one and two standard errors, respectively, when the sample is large enough for that approximation. They are not guaranteed pointwise bounds. A noisy estimate may differ from an exact benchmark by more than one standard error without indicating a bug.
+
+To reach a target relative standard error $\epsilon$ at a nonzero mean, the rough requirement is
+
+$$
+R\gtrsim\frac{\operatorname{Var}(A_a)}{\epsilon^2|\langle A\rangle|^2}.
+$$ {#eq-relative-sampling-cost}
+
+A mean crossing zero makes relative error unsuitable; use an absolute tolerance or another physical scale. Complex correlations need uncertainties for real and imaginary parts, including their covariance when combining them.
+
+The variance in @eq-standard-error is also not generally the quantum measurement variance $\langle A^2\rangle-\langle A\rangle^2$. In fact,
+
+$$
+\operatorname{Var}_{\rho}(A)
+=\mathbb E[\operatorname{Var}_{\psi}(A)]
++\operatorname{Var}_{\mathrm{records}}(\langle A\rangle_\psi).
+$$ {#eq-total-variance}
+
+Computing the expectation within each wavefunction averages over the quantum outcomes still unresolved inside that conditional state. This often reduces variance compared with sampling one projective outcome from every trajectory.
+
+Values at adjacent times in one trajectory are correlated. For time-dependent curves, the independent statistical units are full trajectories. Resample whole trajectories for bootstrap uncertainty in fitted rates or time integrals. For a time average from one long stationary trajectory, ordinary independent-sample formulas must be replaced by estimates that account for autocorrelation.
+
+### Global and local quantities: what actually scales
+
+A rare event with probability $p$ has indicator variance $p(1-p)$ and relative standard error $\sqrt{(1-p)/(Rp)}$. If $p\sim1/D$, resolving a particular many-body basis-state population requires $R$ of order $D$ for fixed relative accuracy. Trajectories offer little advantage for reconstructing all exponentially many such populations.
+
+Spatial locality does **not** by itself imply exponential sampling difficulty. A one-particle probability distributed among $M$ sites has $p_j\sim1/M$, and its relative accuracy may require $R\propto M$. At a fixed nonzero many-particle filling, however, $\langle n_j\rangle$ is of order one, not $1/M$. For hard-core particles $0\leq\langle n_j\rangle_\psi\leq1$, so its trajectory variance is bounded. There is no universal extra factor of $M$ for a local density at fixed filling. This distinction prevents applying single-particle estimates outside their regime.
+
+Global averages can benefit from self-averaging. For $A=M^{-1}\sum_j a_j$, their trajectory variance is
+
+$$
+\operatorname{Var}(A)=\frac1{M^2}\sum_{i,j}\operatorname{Cov}(a_i,a_j).
+$$
+
+Short-ranged, bounded covariances can give variance proportional to $1/M$. Long-ranged collective fluctuations, criticality, or rare events can defeat this advantage. The review's comparison of global and local observables is therefore a useful guide to possible sampling costs, not a theorem based only on Hilbert-space dimension [@Molmer1993; @Daley2014].
+
+### What cannot be averaged directly
+
+Observables linear in $\rho$ use @eq-trajectory-observable. Nonlinear functions require care. In particular, $\mathbb E[S(|\psi\rangle\langle\psi|)]=0$ says nothing about the entropy of the mixed ensemble. Purity can be estimated with two independent trajectory copies:
+
+$$
+\operatorname{tr}\rho^2
+=\mathbb E_{a,b}\left[|\langle\psi_a|\psi_b\rangle|^2\right].
+$$
+
+Using the same trajectory in both slots gives one identically and fails. Finite-sample estimators should exclude or correct same-copy diagonal pairs when an unbiased estimate is wanted.
+
+## Two-time correlation functions {#sec-two-time-correlations}
+
+Spectra, response, and counting statistics depend on quantities such as $C_{AB}(t,\tau)=\langle A(t+\tau)B(t)\rangle$. Under the same Markov reservoir assumptions that justify quantum regression, the correlation is
+
+$$
+C_{AB}(t,\tau)=\operatorname{tr}\left[A\,e^{\mathcal L\tau}(B\rho(t))\right].
+$$ {#eq-regression-correlation}
+
+For a driven time-dependent generator replace $e^{\mathcal L\tau}$ by the propagator from $t$ to $t+\tau$. A valid one-time reduced equation alone does not guarantee regression in an arbitrary non-Markovian microscopic model.
+
+The important obstruction is that $B\rho(t)$ need not be Hermitian or positive and need not have unit trace. It cannot generally be used as an ordinary physical initial density operator. Nor does propagating $B|\psi\rangle$ alone work: that would evolve $B|\psi\rangle\langle\psi|B^\dagger$, with an unwanted operator on the right.
+
+### A four-state construction
+
+For each trajectory at time $t$, set $P=|\psi\rangle\langle\psi|$ and form the unnormalized helper vectors
+
+$$
+|v_\pm^R\rangle=(I\pm B)|\psi\rangle,
+\qquad |v_\pm^I\rangle=(I\pm iB)|\psi\rangle.
+$$
+
+If $B$ carries physical units, first divide it by an arbitrary reference scale to make these sums dimensionally consistent, and multiply the reconstructed correlation by that scale. The polarization identity gives
+
+$$
+BP=\frac14\left(
+|v_+^R\rangle\langle v_+^R|-|v_-^R\rangle\langle v_-^R|
+-i|v_+^I\rangle\langle v_+^I|+i|v_-^I\rangle\langle v_-^I|
+\right).
+$$ {#eq-polarization-dyad}
+
+Let $\mu_\pm^{R,I}=\langle v_\pm^{R,I}|v_\pm^{R,I}\rangle$ and normalize each nonzero helper. Independently propagate these physical states for duration $\tau$ using the usual trajectory method. If $c_\pm^{R,I}$ denotes its final expectation of $A$, combine the weighted outputs as
+
+$$
+\widehat C=\frac14\left(
+\mu_+^Rc_+^R-\mu_-^Rc_-^R
+-i\mu_+^Ic_+^I+i\mu_-^Ic_-^I\right).
+$$ {#eq-correlation-four-state}
+
+Averaging over both the trajectories reaching $t$ and their subsequent helper histories gives @eq-regression-correlation. Zero-norm terms contribute zero and are skipped. The proof is simply linearity of the propagator applied to @eq-polarization-dyad. The helper histories can use independent random numbers; correlated sampling is also possible if each marginal is correct and its covariance is included in the error estimate [@Molmer1993; @Daley2014].
+
+### An equivalent doubled-state idea
+
+There is another way to preserve the dyad $B|\psi\rangle\langle\psi|$. Work on $\mathcal H\oplus\mathcal H$, with
+
+$$
+|\Theta\rangle=\frac1{\sqrt s}
+\begin{pmatrix}B|\psi\rangle\\|\psi\rangle\end{pmatrix},
+\quad s=\|B|\psi\rangle\|^2+1,
+\quad \mathbb H=\begin{pmatrix}H&0\\0&H\end{pmatrix},
+\quad \mathbb L_m=\begin{pmatrix}L_m&0\\0&L_m\end{pmatrix}.
+$$
+
+The upper-right block of $|\Theta\rangle\langle\Theta|$ initially equals $BP/s$. Its ensemble evolution is $e^{\mathcal L\tau}(BP)/s$. If the final normalized doubled vector has components $(|u\rangle,|v\rangle)$, an unbiased correlation sample is $s\langle v|A|u\rangle$. The two components must experience the **same selected jump channel** of the doubled process. Two separately normalized independent trajectories do not propagate their cross dyad correctly. Reference scales can again make the two components dimensionally comparable.
+
+This enlarged-space construction is an algorithm for a nonpositive operator; it does not reinterpret $B\rho$ as a physical density operator. Both methods expose the missing bra information that a naive propagation of $B|\psi\rangle$ discards.
+
+## A reliable workflow
+
+Start with a small system for which direct master-equation propagation is possible. Check trace and Hermiticity there, compare trajectory means with that reference, and verify a known identity such as exponential population decay. Reduce the time step or event tolerance until the change is smaller than sampling uncertainty. Increase $R$ and check the expected $R^{-1/2}$ trend over an appropriate range. Record random seeds and solver tolerances with physical parameters, so a surprising history can be reproduced.
+
+The memory advantage is roughly $D$ versus $D^2$ per realization; total arithmetic cost also depends on the required $R$, the sparsity of operators, and the state representation. Independent trajectories parallelize naturally. For matrix-product states, the dominant cost may instead be the bond dimension needed along difficult trajectories. Choosing an unraveling can alter sampling variance and conditional entanglement even when it leaves $\mathcal L$ unchanged.
+
+## Exercises
+
+1. **A norm threshold with a dark component.** For an undriven atom initially $\alpha|g\rangle+\beta|e\rangle$, find $S(t)$ and the probability that no jump ever occurs.
+
+   *Solution.* $S(t)=|\alpha|^2+|\beta|^2e^{-\Gamma t}$. Its limiting value $|\alpha|^2$ is the probability of no future emission. If a threshold is above that limit, $t_1=-\Gamma^{-1}\log[(u-|\alpha|^2)/|\beta|^2]$.
+
+2. **Averaging nonlinear quantities.** For equally likely $|g\rangle$ and $|e\rangle$, compare the average trajectory purity with the purity of the averaged density operator.
+
+   *Solution.* They are one and one-half, respectively.
+
+3. **Check the correlation at zero delay.** Insert the four helpers into @eq-correlation-four-state at $\tau=0$ and recover $\langle\psi|AB|\psi\rangle$ without assuming $A$ or $B$ is Hermitian.
+
+   *Hint.* Expand the four outer products, rather than individual expectation values.
+
+4. **Required sample count.** A rare occupation has probability $10^{-3}$. Estimate the number of independent indicator samples needed for a 10% relative standard error.
+
+   *Solution.* @eq-relative-sampling-cost gives approximately $10^5$. Reporting many decimal places from a few hundred trajectories would not resolve this event probability.

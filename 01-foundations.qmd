@@ -1,0 +1,139 @@
+# From isolated states to open many-body systems {#sec-foundations}
+
+Quantum trajectories connect two descriptions of the same experiment. One description predicts the density operator of a system when an observer does not retain the environmental measurement record. The other predicts a state conditioned on a particular record: the times of detected photons, their directions, or the positions of lost particles. Averaging the conditional predictions recovers the density operator. That connection is the organizing principle of this book.
+
+The backbone is Andrew Daley's review, *Quantum trajectories and open many-body quantum systems* [@Daley2014]. We develop its arguments in a different order and supply intermediate calculations. Our starting point is ordinary quantum mechanics, and our destination is interacting matter subject to loss, dephasing, measurement, and deliberately engineered dissipation. The central questions are practical as well as conceptual: Which environmental processes can be modeled reliably? What is actually simulated by a quantum jump? When does replacing a density matrix with random wavefunctions reduce the computational cost?
+
+## Prerequisites and conventions
+
+A reader should know vectors and matrices, eigenvalues, complex numbers, elementary differential equations, and the Schrödinger equation. We introduce density matrices and the additional stochastic ideas as they are needed. Familiarity with creation and annihilation operators is useful; their many-body role is explained below.
+
+We set Planck's constant to one, $\hbar=1$, from this point onward. A Hamiltonian therefore has units of inverse time; restoring units changes $-i[H,\rho]$ to $-i[H,\rho]/\hbar$. We use $J$ for a hopping frequency, $\Omega$ for a Rabi frequency, and $\gamma$ or $\Gamma$ for dissipative rates. Every jump operator $L_m$ **includes the square root of its rate**, so $L_m$ has units $\mathrm{time}^{-1/2}$. In particular, spontaneous emission is represented by $L=\sqrt{\Gamma}\,|g\rangle\langle e|$, not by $|g\rangle\langle e|$ alone.
+
+For an operator $A$, $\langle A\rangle=\operatorname{tr}(A\rho)$ denotes its quantum expectation. The symbol $\mathbb E$ denotes an average over random records or numerical trajectories. A sample average over finitely many realizations carries an overbar. We distinguish the number of lattice sites $M$, the number of particles $N_p$, the Hilbert-space dimension $D$, and the number of trajectories $R$.
+
+## Why a wavefunction can cease to describe a subsystem {#sec-reduced-state}
+
+For an isolated system, a normalized vector $|\psi\rangle$ gives probabilities through the Born rule. Its density operator is $\rho=|\psi\rangle\langle\psi|$. More generally, if a preparation produces $|\psi_a\rangle$ with classical probability $p_a$, then
+
+$$
+\rho=\sum_a p_a|\psi_a\rangle\langle\psi_a|,
+\qquad p_a\geq0,\qquad \sum_a p_a=1.
+$$ {#eq-density-mixture}
+
+The density operator is Hermitian, positive semidefinite, and has unit trace. Positivity means $\langle v|\rho|v\rangle\geq0$ for every vector $|v\rangle$ and guarantees nonnegative measurement probabilities. A pure state satisfies $\rho^2=\rho$ and $\operatorname{tr}\rho^2=1$. For a mixed state, $\operatorname{tr}\rho^2<1$.
+
+The decomposition in @eq-density-mixture is not unique. For example,
+
+$$
+\frac{I}{2}=\frac{|g\rangle\langle g|+|e\rangle\langle e|}{2}
+=\frac{|+\rangle\langle+|+|-\rangle\langle-|}{2},
+\quad |\pm\rangle=\frac{|g\rangle\pm|e\rangle}{\sqrt2}.
+$$
+
+Consequently, a density operator generally does not identify the particular ensemble that prepared it. This elementary observation will reappear as the freedom to choose an *unraveling* of a master equation.
+
+Now divide a larger system into a subsystem $S$ and an environment $E$. Their Hilbert space is $\mathcal H_S\otimes\mathcal H_E$. If $\rho_{SE}$ describes the pair, predictions for measurements on $S$ alone follow from the reduced state
+
+$$
+\rho_S=\operatorname{tr}_E\rho_{SE}
+=\sum_\mu\langle\mu|\rho_{SE}|\mu\rangle,
+$$ {#eq-partial-trace}
+
+where $\{|\mu\rangle\}$ is any orthonormal environment basis. The defining identity is $\operatorname{tr}_{SE}[(A\otimes I_E)\rho_{SE}]=\operatorname{tr}_S(A\rho_S)$.
+
+For a concrete calculation, suppose an excited atom can emit a photon. A simplified joint state is
+
+$$
+|\Psi\rangle=\alpha|e\rangle|0\rangle_E+\beta|g\rangle|1\rangle_E,
+\qquad |\alpha|^2+|\beta|^2=1.
+$$
+
+Because the vacuum and one-photon states are orthogonal, tracing out the field removes the cross terms:
+
+$$
+\rho_S=|\alpha|^2|e\rangle\langle e|+|\beta|^2|g\rangle\langle g|.
+$$
+
+The joint state is pure, but the atomic state is mixed. No random force had to be inserted into the joint Schrödinger equation: entanglement with unobserved degrees of freedom is sufficient.
+
+If instead a detector distinguishes vacuum from one photon, the atomic state conditioned on its outcome is $|e\rangle$ or $|g\rangle$. Ignoring the detector outcome restores the mixture. A measurement of a different field observable can produce a different conditional atomic ensemble with the same unconditioned density operator.
+
+## Coherence, population, and entanglement
+
+In a chosen basis, diagonal entries $\rho_{ii}$ are populations. Off-diagonal entries $\rho_{ij}$ are coherences, which carry relative-phase information. Their physical interpretation depends on the basis. A state diagonal in energy can still possess position coherence.
+
+Two elementary environmental processes should be distinguished. *Relaxation* changes populations, such as $|e\rangle\to|g\rangle$. *Pure dephasing* suppresses coherence in a preferred basis without directly moving population between its basis states. A lattice density measurement, for example, destroys coherence between configurations with different local occupations. Hamiltonian evolution can subsequently convert the changed coherences into changed populations.
+
+Entanglement is different from either population uncertainty or classical correlation. A bipartite pure state has a Schmidt decomposition
+
+$$
+|\psi\rangle=\sum_{a=1}^{\chi}s_a|a\rangle_A|a\rangle_B,
+\quad s_a\geq0,\quad\sum_a s_a^2=1.
+$$ {#eq-schmidt-foundation}
+
+The reduced density operator has eigenvalues $s_a^2$, and its von Neumann entropy is
+
+$$
+S_A=-\operatorname{tr}(\rho_A\log\rho_A)
+=-\sum_a s_a^2\log s_a^2.
+$$
+
+For a pure global state this entropy measures entanglement across the cut. For a mixed global state, a subsystem entropy also includes classical uncertainty and is not by itself an entanglement measure. This distinction matters when comparing matrix-product representations of individual pure trajectories with representations of the mixed density operator. The entanglement of a chosen trajectory ensemble is not fixed by $\rho$ alone.
+
+## Why many bodies change the computational problem
+
+For $M$ distinguishable spins with $d$ states each, $D=d^M$. A generic pure state requires $D$ complex amplitudes, whereas a density matrix requires $D^2$ entries. For spin one-half, $D=2^M$. Even before time integration, storing a dense density matrix becomes much more expensive than storing a state vector.
+
+Particles in a lattice are conveniently described in an occupation basis. A bosonic configuration is $|n_1,\ldots,n_M\rangle$, and
+
+$$
+a_j|n_1,\ldots,n_j,\ldots\rangle
+=\sqrt{n_j}\,|n_1,\ldots,n_j-1,\ldots\rangle.
+$$
+
+The canonical bosonic commutator is $[a_i,a_j^\dagger]=\delta_{ij}$. Fermions obey anticommutators, $\{f_i,f_j^\dagger\}=\delta_{ij}$, and occupation is zero or one for each single-particle mode. Hard-core bosons also have occupations zero or one, but commute on different sites; this difference affects nonlocal correlation functions.
+
+A standard coherent model is the Bose–Hubbard Hamiltonian
+
+$$
+H=-J\sum_{\langle i,j\rangle}(a_i^\dagger a_j+a_j^\dagger a_i)
++\frac U2\sum_j n_j(n_j-1)+\sum_j V_jn_j,
+\qquad n_j=a_j^\dagger a_j.
+$$ {#eq-bose-hubbard-foundation}
+
+Each undirected bond appears once in the first sum. Hopping spreads particles, interaction penalizes multiple occupation, and $V_j$ describes a trap or site-dependent energy. Restricting to a fixed number of bosons reduces the dimension to $\binom{N_p+M-1}{N_p}$, but the growth remains severe when particle number and lattice size grow together. Loss also connects different particle-number sectors, so a useful conserved quantity of the isolated model need not remain a conserved quantity of the open model.
+
+Quantum trajectories exchange one obstacle for another: they propagate state vectors and average random outcomes, introducing sampling error. They do not remove exponential complexity from a generic interacting wavefunction. Many-body structure, especially low entanglement in one dimension, is the additional ingredient that makes larger calculations possible [@White2004; @Vidal2004].
+
+## What an open-system model must specify
+
+The total Hamiltonian has the form
+
+$$
+H_{SE}=H_S\otimes I_E+I_S\otimes H_E+H_{\mathrm{int}}.
+$$ {#eq-system-environment-hamiltonian}
+
+It is useful to write $H_{\mathrm{int}}=\sum_\alpha S_\alpha\otimes B_\alpha$, with system operators $S_\alpha$ and environment operators $B_\alpha$. Exact reduced dynamics follow by evolving the total state and taking a partial trace. That prescription is usually too expensive, but it identifies the information a reduced model must retain: the reservoir's state, its correlation times, its frequency dependence, and the system operators to which it couples.
+
+A bath is not automatically thermal, and dissipation is not automatically cooling. A laser-driven atom emits while absorbing work from its drive. Density dephasing can heat a lattice gas even while leaving its particle number unchanged. Carefully designed jump operators can instead remove defects and prepare an ordered state. The sign of an energy change depends on the Hamiltonian, the state, and the coupling.
+
+The quantum-optical setting emphasized by Daley is unusually favorable because a large carrier frequency can separate microscopic optical oscillations from slower tunneling, interaction, drive, and decay dynamics. Under additional weak-coupling and short-memory assumptions, this separation leads to a Markovian master equation. These are physical approximations, not consequences of writing a density operator.
+
+## Exercises
+
+1. **Partial trace by hand.** For $|\Psi\rangle=\sqrt p\,|0\rangle_S|0\rangle_E+\sqrt{1-p}\,|1\rangle_S|1\rangle_E$, calculate $\rho_S$, its purity, and its entropy. At which values of $p$ is the subsystem pure?
+
+   *Solution.* The eigenvalues are $p$ and $1-p$. Thus the purity is $p^2+(1-p)^2$ and the entropy is $-p\log p-(1-p)\log(1-p)$, with $0\log0=0$. Purity occurs at $p=0,1$.
+
+2. **The same mixture, different records.** Verify both decompositions of $I/2$ above. Explain why a later measurement on the atom alone cannot identify which decomposition was used.
+
+   *Hint.* Every measurement probability is linear in $\rho$. The environmental record can distinguish the preparations; the reduced state cannot.
+
+3. **Storage estimates.** A double-precision complex number occupies 16 bytes. Compare dense pure-state and density-matrix storage for 20 spins one-half.
+
+   *Solution.* The vector requires $16\times2^{20}$ bytes, about 16 MiB. The density matrix requires $16\times2^{40}$ bytes, about 16 TiB, before any workspace for the solver.
+
+4. **Number conservation.** Show that @eq-bose-hubbard-foundation commutes with $N=\sum_jn_j$. Explain why a jump proportional to $a_j$ changes the answer for open evolution.
+
+   *Hint.* Each hopping term removes and creates one particle; $[N,a_j]=-a_j$.

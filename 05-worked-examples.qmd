@@ -1,0 +1,280 @@
+# Worked examples: fluorescence and lattice dephasing {#sec-worked-examples}
+
+The two examples in Section III E of the review isolate complementary ideas [@Daley2014]. A driven two-level atom shows how random emission times turn coherent conditional motion into damped ensemble dynamics. A hard-core lattice gas shows how number-conserving measurements heat a many-body system, produce fluctuating local densities, and preserve symmetries only after averaging. Both admit exact checks that are valuable before attempting a large simulation.
+
+## A driven atom and the optical Bloch equations {#sec-optical-bloch}
+
+Let $|g\rangle$ and $|e\rangle$ be the ground and excited states. In the frame rotating with a classical laser, choose
+
+$$
+H=-\Delta|e\rangle\langle e|+\frac\Omega2(\sigma_++\sigma_-),
+\quad \sigma_-=|g\rangle\langle e|,
+\quad L=\sqrt\Gamma\,\sigma_-.
+$$ {#eq-driven-atom-model}
+
+The detuning is $\Delta=\omega_{\mathrm{laser}}-\omega_0$, $\Omega$ is real, and $\Gamma$ is the spontaneous-emission population decay rate. The sign of $\Omega$ can be changed by shifting the laser phase by $\pi$; some presentations, including the review, use that alternate sign. None of the populations below depends on this choice.
+
+Define $\rho_{eg}=\langle e|\rho|g\rangle$. Inserting the model into the master equation gives
+
+$$
+\begin{aligned}
+\dot\rho_{ee}&=-\Gamma\rho_{ee}
+-\frac{i\Omega}{2}(\rho_{ge}-\rho_{eg}),\\
+\dot\rho_{eg}&=(i\Delta-\Gamma/2)\rho_{eg}
+-\frac{i\Omega}{2}(\rho_{gg}-\rho_{ee}),\\
+\rho_{gg}&=1-\rho_{ee},\qquad \rho_{ge}=\rho_{eg}^*.
+\end{aligned}
+$$ {#eq-optical-bloch-components}
+
+These equations contain coherent rotation, excited-population decay at rate $\Gamma$, and coherence decay at rate $\Gamma/2$. Trace conservation supplies the ground population equation automatically.
+
+For real Bloch coordinates $u=\langle\sigma_x\rangle=2\operatorname{Re}\rho_{eg}$, $v=\langle\sigma_y\rangle=-2\operatorname{Im}\rho_{eg}$, and $w=\rho_{ee}-\rho_{gg}$, they become
+
+$$
+\dot u=\Delta v-\frac\Gamma2u,\qquad
+\dot v=-\Delta u-\Omega w-\frac\Gamma2v,\qquad
+\dot w=\Omega v-\Gamma(w+1).
+$$ {#eq-optical-bloch-vector}
+
+The sign in the definition of $v$ follows from using $\rho_{eg}$ rather than $\rho_{ge}$. Fixing this convention avoids a common apparent disagreement between otherwise equivalent Bloch equations.
+
+### Deriving saturation
+
+At steady state, solve the first two equations for $u$ and $v$ and substitute into the third. The result is
+
+$$
+p_e^{\mathrm{ss}}=\frac{\Omega^2}{\Gamma^2+2\Omega^2+4\Delta^2},
+\qquad
+\rho_{eg}^{\mathrm{ss}}=
+\frac{\Omega(2\Delta-i\Gamma)}{\Gamma^2+2\Omega^2+4\Delta^2}.
+$$ {#eq-atom-steady-state}
+
+Equivalently, with $s=2\Omega^2/(\Gamma^2+4\Delta^2)$, $p_e^{\mathrm{ss}}=s/[2(1+s)]$. Weak driving gives $p_e^{\mathrm{ss}}\simeq\Omega^2/(\Gamma^2+4\Delta^2)$; strong resonant driving approaches one-half. Increasing the laser strength cannot invert this simple two-level system with only coherent driving and spontaneous emission. The steady fluorescence rate is $\Gamma p_e^{\mathrm{ss}}$ and saturates at $\Gamma/2$.
+
+At resonance, starting in $|g\rangle$, the exact transient population is
+
+$$
+p_e(t)=p_e^{\mathrm{ss}}\left[
+1-e^{-3\Gamma t/4}
+\left(\cos\Omega_Rt+\frac{3\Gamma}{4\Omega_R}\sin\Omega_Rt\right)
+\right],
+\qquad \Omega_R=\sqrt{\Omega^2-\Gamma^2/16}.
+$$ {#eq-resonant-population}
+
+For $\Omega<\Gamma/4$, write $\Omega_R=i\lambda$ and replace cosine and sine combinations by their real hyperbolic continuations. At equality, use the smooth limit $\sin(\Omega_Rt)/\Omega_R\to t$. In the nondissipative limit, the result becomes $\sin^2(\Omega t/2)$. Its initial expansion is $p_e(t)=\Omega^2t^2/4+O(t^3)$, as required by coherent excitation from the ground state.
+
+### What a single trajectory does
+
+The effective Hamiltonian is
+
+$$
+H_{\mathrm{eff}}=
+\begin{pmatrix}
+-\Delta-i\Gamma/2&\Omega/2\\
+\Omega/2&0
+\end{pmatrix}
+$$ {#eq-atom-effective-matrix}
+
+in the ordered basis $(|e\rangle,|g\rangle)$. The instantaneous jump rate is $\Gamma|c_e|^2$ for a normalized state $c_e|e\rangle+c_g|g\rangle$. An emission applies $\sigma_-$ and returns it to $|g\rangle$. Afterward coherent excitation begins again.
+
+![Original numerical illustration of conditional fluorescence trajectories and their ensemble average compared with direct master-equation evolution. The accompanying computational laboratory gives parameters and regeneration instructions.](figs/fluorescence){#fig-fluorescence-example}
+
+In a strongly driven trajectory, excited occupation repeatedly rises and is interrupted by abrupt resets. The ensemble average damps because the resets occur at different times, so the members cease to oscillate in phase. This does not mean the conditional pure state gradually turns into a mixed state in an ideal monitored experiment. Mixing describes the uncertainty after those individual records are forgotten.
+
+At resonance the unnormalized no-count amplitudes after a reset are also explicit. Define $\chi=\sqrt{\Omega^2-\Gamma^2/4}$. Then
+
+$$
+\widetilde c_e(t)=-i\frac\Omega\chi e^{-\Gamma t/4}\sin\frac{\chi t}{2},
+\qquad
+\widetilde c_g(t)=e^{-\Gamma t/4}
+\left(\cos\frac{\chi t}{2}+\frac\Gamma{2\chi}\sin\frac{\chi t}{2}\right).
+$$ {#eq-atom-no-count-amplitudes}
+
+Their squared norms give the survival probability. The next-photon waiting density is
+
+$$
+w_{\mathrm{next}}(t)=\Gamma|\widetilde c_e(t)|^2
+=\Gamma\frac{\Omega^2}{\chi^2}e^{-\Gamma t/2}\sin^2\frac{\chi t}{2},
+$$ {#eq-atom-waiting-density}
+
+with the corresponding hyperbolic continuation when $\chi$ is imaginary. The conditional frequency $\chi$ differs from the ensemble transient frequency $\Omega_R$ in @eq-resonant-population. They solve different evolution problems.
+
+### Antibunching and a two-time observable
+
+A useful test beyond mean populations is the normalized stationary intensity correlation
+
+$$
+g^{(2)}(\tau)=
+\frac{\langle L^\dagger(0)L^\dagger(\tau)L(\tau)L(0)\rangle_{\mathrm{ss}}}
+{\langle L^\dagger L\rangle_{\mathrm{ss}}^2}
+=\frac{\operatorname{tr}\left[L^\dagger L\,
+ e^{\mathcal L\tau}(L\rho_{\mathrm{ss}}L^\dagger)\right]}
+{(\Gamma p_e^{\mathrm{ss}})^2}.
+$$ {#eq-atom-g2-regression}
+
+The operator $L\rho_{\mathrm{ss}}L^\dagger$ is positive in this example, in contrast to the general $B\rho$ of @eq-regression-correlation. A count prepares the ground state, so the numerator is the stationary count rate times the subsequent conditional mean count rate. Therefore
+
+$$
+g^{(2)}(\tau)=\frac{p_e(\tau\mid g)}{p_e^{\mathrm{ss}}}.
+$$
+
+At resonance this becomes
+
+$$
+g^{(2)}(\tau)=1-e^{-3\Gamma\tau/4}
+\left(\cos\Omega_R\tau+\frac{3\Gamma}{4\Omega_R}\sin\Omega_R\tau\right).
+$$ {#eq-atom-g2}
+
+It vanishes at zero delay: immediately after emission the atom cannot emit again until it has been re-excited. This is photon antibunching. At long delays it approaches one because the system forgets the original count. The oscillations at strong drive express coherent re-excitation.
+
+The waiting density in @eq-atom-waiting-density asks when the **next** count occurs, excluding any intervening count. By contrast, $g^{(2)}$ counts pairs separated by $\tau$ whether or not other photons were emitted between them. Confusing these objects gives the wrong correlation even if the mean fluorescence rate is correct. In trajectory analysis, pair histograms require proper normalization by bin width, total observation time, and stationary mean intensity; selecting only adjacent counts estimates a waiting distribution instead.
+
+## Hard-core bosons with local density dephasing {#sec-hardcore-dephasing}
+
+Consider a one-dimensional chain with hard-core annihilation operators $b_j$. At each site, $b_j^2=0$ and $n_j=b_j^\dagger b_j$ has eigenvalues zero and one; operators on different sites commute. Take
+
+$$
+H=-J\sum_{j=1}^{M-1}(b_j^\dagger b_{j+1}+b_{j+1}^\dagger b_j),
+\qquad L_j=\sqrt\gamma\,n_j.
+$$ {#eq-hardcore-model}
+
+A periodic chain adds the boundary bond. This is the large-$U/J$ limit of the Bose–Hubbard model at energies that suppress double occupation. The density jumps model environmental acquisition of site occupation information, such as a simplified limit of light scattering. The full microscopic light-scattering problem includes spatial resolution and band-changing effects; those assumptions must be checked before using this reduced model in an experiment.
+
+The dissipator is
+
+$$
+\dot\rho=-i[H,\rho]-\frac\gamma2\sum_j[n_j,[n_j,\rho]].
+$$ {#eq-hardcore-dephasing}
+
+It conserves $N=\sum_jn_j$, but it does not conserve kinetic energy. In the occupation basis $|\boldsymbol n\rangle$, the dissipative decay of a coherence is
+
+$$
+\left.\dot\rho_{\boldsymbol n,\boldsymbol n'}\right|_{\mathrm{diss}}
+=-\frac\gamma2\sum_j(n_j-n'_j)^2\rho_{\boldsymbol n,\boldsymbol n'}.
+$$ {#eq-configuration-dephasing}
+
+Configurations differing at two sites, as in a single hopping event, lose their mutual coherence at rate $\gamma$. Configurations differing over many sites lose coherence faster. Population in an occupation configuration is not directly changed by the dissipator, although hopping continues to redistribute it.
+
+### Exact exponential relaxation of the kinetic energy
+
+For a hopping term $T_{ij}=b_i^\dagger b_j$ with $i\ne j$,
+
+$$
+[n_\ell,T_{ij}]=(\delta_{\ell i}-\delta_{\ell j})T_{ij},
+\qquad
+\sum_\ell[n_\ell,[n_\ell,T_{ij}]]=2T_{ij}.
+$$
+
+The adjoint of the dephasing generator therefore sends each hopping term to $-\gamma T_{ij}$. Since the Hamiltonian commutes with itself,
+
+$$
+\frac d{dt}E(t)=-\gamma E(t),
+\qquad E(t)=\langle H\rangle_t=E(0)e^{-\gamma t}.
+$$ {#eq-hardcore-energy-decay}
+
+This identity holds for any initial state of this hopping-only model, for open or periodic boundaries. It is an excellent diagnostic because it does not rely on trajectory sampling. If the initial kinetic energy is negative, it increases toward zero: dephasing heats the gas. The energy influx initially equals $-\gamma E(0)>0$ and decreases as coherence is depleted.
+
+Adding an inhomogeneous potential, other noncommuting Hamiltonian terms, or additional jump channels can spoil this single exponential for total energy. One should not carry the result unchanged into a general interacting Bose–Hubbard model.
+
+### The trajectory has an unusually simple waiting time
+
+In the hard-core subspace, $n_j^2=n_j$. Within a fixed-$N_p$ sector,
+
+$$
+\sum_jL_j^\dagger L_j=\gamma\sum_jn_j=\gamma N_p I,
+\qquad H_{\mathrm{eff}}=H-i\gamma N_p/2.
+$$ {#eq-hardcore-effective}
+
+The non-Hermitian term is a scalar. Normalized no-count evolution is exactly unitary, while survival is $S(\tau)=e^{-\gamma N_p\tau}$. Draw the next waiting time as
+
+$$
+\tau=-\frac{\log u}{\gamma N_p}.
+$$
+
+At the event time, select a site with probability
+
+$$
+p(j\mid\mathrm{event})=\frac{\langle n_j\rangle}{N_p},
+\qquad
+|\psi\rangle\longmapsto\frac{n_j|\psi\rangle}{\sqrt{\langle n_j\rangle}}.
+$$ {#eq-hardcore-site-jump}
+
+This count establishes that the selected site is occupied. It does not label a distinguishable particle, and it does not measure all other site occupations. Correlations make the conditional densities at other sites change as well. Repeated position information suppresses delocalized coherence and changes the kinetic energy.
+
+Here the absence of a count contains no information *within the known fixed-number sector*: all its states have the same total hazard. If particle number were uncertain, no-count survival would favor lower-number sectors. Soft-core bosons also behave differently because $n_j^2\ne n_j$, and the total rate $\gamma\sum_j\langle n_j^2\rangle$ becomes state-dependent.
+
+At full filling, the single hard-core configuration has no allowed hopping, and every density jump leaves it unchanged. Counts can occur without changing the normalized state. Their existence alone does not measure a nonzero decoherence rate for that particular state.
+
+### A minimal two-site calculation
+
+With one particle on two sites, identify $|10\rangle$ and $|01\rangle$ as a two-level basis. The Hamiltonian is $-J\sigma_x$. Starting in the bonding ground state $(|10\rangle+|01\rangle)/\sqrt2$, the one-body off-diagonal element decays as
+
+$$
+\langle b_1^\dagger b_2\rangle_t=\frac12e^{-\gamma t},
+\qquad E(t)=-Je^{-\gamma t}.
+$$ {#eq-dimer-dephasing}
+
+Both densities remain one-half. A site count projects the conditional state onto one of the two sites; subsequent hopping spreads it again. Individual records therefore have time-dependent densities even though the ensemble density remains uniform.
+
+For a periodic chain with a translation-invariant initial **density operator**, translation invariance of the generator and number conservation force $\langle n_j(t)\rangle=N_p/M$. A single site-resolved history generally breaks that invariance. Uniform initial mean densities alone are not sufficient for the conclusion: a state can have uniform densities and nonuniform currents that later redistribute them. The full symmetry assumption matters.
+
+### What the Jordan–Wigner map does and does not solve {#sec-jordan-wigner-caveat}
+
+In one dimension define fermions by
+
+$$
+b_j=\exp\left(i\pi\sum_{k<j}f_k^\dagger f_k\right)f_j.
+$$ {#eq-jordan-wigner}
+
+For an open chain the nearest-neighbor Hamiltonian becomes a free-fermion hopping Hamiltonian, and $n_j=f_j^\dagger f_j$. Periodic boundary conditions require the usual particle-parity-dependent boundary term. This mapping permits particularly efficient treatment of density and kinetic-energy observables.
+
+For example, writing $H=\sum_{ij}f_i^\dagger h_{ij}f_j$ and $C_{ij}=\langle f_j^\dagger f_i\rangle$, the covariance obeys the closed equation
+
+$$
+\dot C=-i[h,C]-\gamma\bigl(C-\operatorname{diag}C\bigr).
+$$ {#eq-fermion-covariance-dephasing}
+
+No assumption that the unconditional state stays Gaussian is needed for this equation: it follows from the commutators of bilinears with the Hamiltonian and densities. A mixture of conditional Gaussian states need not itself be Gaussian, so covariance closure does not imply that arbitrary higher moments are determined by Wick's theorem.
+
+Most importantly, the bosonic off-diagonal correlation is not simply the fermionic covariance. For $i<j$,
+
+$$
+b_i^\dagger b_j=f_i^\dagger
+\left[\prod_{i<k<j}(1-2n_k)\right]f_j.
+$$ {#eq-bosonic-string-correlator}
+
+Only a nearest-neighbor bond has an empty string. The bosonic momentum distribution
+
+$$
+n_b(q)=\frac1M\sum_{i,j}e^{iq(i-j)}\langle b_i^\dagger b_j\rangle
+$$
+
+therefore involves nonlocal fermionic strings. Free coherent fermion dynamics and a closed one-body covariance equation do not automatically solve this momentum distribution in the dephasing mixed state. One needs appropriate string expectations, a richer representation, or a trajectory method that evaluates the actual bosonic operator. This qualification is essential when using Jordan–Wigner solvability to justify a many-body calculation.
+
+## What these examples establish
+
+The fluorescence solution and exponential kinetic-energy law are exact results within their stated Markov models. A finite trajectory sample agrees with them only up to deterministic integration error and statistical uncertainty. The interpretation of the dephasing channel as site-resolved scattering is a physical approximation, not an identity valid for every optical lattice. These separate levels of statement keep a successful numerical benchmark from being mistaken for a microscopic validation of an experiment.
+
+Together the examples also show why no universal visual picture of a jump is sufficient. An atomic emission changes the internal state and the available future count rate. A density count conserves particle number and projects occupation information. At fixed hard-core number, no-count propagation is unitary after normalization; for the atom it is not. The master equation and its chosen measurement arrangement determine the correct picture.
+
+## Exercises
+
+1. **Saturation and linewidth.** At fixed $\Omega$, calculate the detuning at which $p_e^{\mathrm{ss}}$ is half its resonant value.
+
+   *Solution.* $|\Delta|=\tfrac12\sqrt{\Gamma^2+2\Omega^2}$. The increase with drive is power broadening.
+
+2. **Initial antibunching.** Expand @eq-atom-g2 to second order at small $\tau$ and compare with coherent excitation from the ground state.
+
+   *Solution.* $g^{(2)}(\tau)=[(\Gamma^2+2\Omega^2)/4]\tau^2+O(\tau^3)$. Multiplying by $p_e^{\mathrm{ss}}$ gives $p_e(\tau\mid g)=\Omega^2\tau^2/4+O(\tau^3)$.
+
+3. **An exact count distribution.** For fixed-$N_p$ hard-core dephasing, find the distribution of the total number of counts in an interval of duration $T$.
+
+   *Solution.* The total hazard is constant, so it is Poisson with mean $\gamma N_pT$. The selected site sequence is not independent: its conditional probabilities depend on the evolving many-body state.
+
+4. **Coherence versus density.** Use @eq-configuration-dephasing to compare the decay of $|100\rangle\langle010|$ with that of $|1010\rangle\langle0101|$.
+
+   *Solution.* Their rates are $\gamma$ and $2\gamma$, because their occupations differ at two and four sites, respectively.
+
+5. **A boundary of one-body closure.** For $i$ and $j$ separated by one intervening site, write the string in @eq-bosonic-string-correlator explicitly. Which four-fermion expectation appears?
+
+   *Solution.* $\langle b_i^\dagger b_{i+2}\rangle=\langle f_i^\dagger f_{i+2}\rangle-2\langle f_i^\dagger n_{i+1}f_{i+2}\rangle$. The second term is not fixed by a covariance matrix for a general non-Gaussian mixed state.

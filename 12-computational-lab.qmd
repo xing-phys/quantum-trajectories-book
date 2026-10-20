@@ -1,0 +1,241 @@
+# A reproducible computational laboratory {#sec-computational-lab}
+
+The most useful first trajectory program is one small enough to check independently. This laboratory implements resonance fluorescence, dephasing of one hard-core particle, and a lossy dimer. These are deliberately small benchmark systems, related to the illustrative examples in section III E of @Daley2014. The same stochastic logic applies to large many-body states; the representation and propagator are what change.
+
+The simulations are written in Julia using only `LinearAlgebra` and `Random`. The tests use `Test`. Python is used solely to plot the Julia-generated data. This separation makes it possible to inspect the scientific calculation without installing a plotting library in Julia. All four figures below are original calculations made for this book.
+
+## Run the laboratory
+
+From the repository root, with Julia 1.10 or later:
+
+```bash
+julia --project=. --startup-file=no test/runtests.jl
+julia --project=. --startup-file=no scripts/trajectories.jl
+python3 -m venv .venv
+.venv/bin/pip install -r scripts/requirements-figures.txt
+.venv/bin/python scripts/make_figures.py
+```
+
+The exact pinned plotting packages target a recent Python environment; Python 3.12 was used for the committed results. The Julia simulation does not need these packages. Its checked-in output was generated with Julia 1.12.6, seed `20261020`, and one BLAS thread. Identical seeds reproduce an experiment within the same runtime, but bitwise equality across Julia versions is not promised. The tests check physics and numerical tolerances instead of matching a stored sequence of floating-point numbers.
+
+The implementation is available as [trajectories.jl](scripts/trajectories.jl), with [physics tests](test/runtests.jl), [plotting source](scripts/make_figures.py), and [runtime metadata](data/numerics-metadata.txt). Figures are committed as both PNG and PDF, so reading or building the book never requires rerunning an ensemble. The CSV files in `data/` contain the plotted values and uncertainties.
+
+## The model and the event clock
+
+The central object is `JumpModel(H, jumps)`. It checks that $H$ is Hermitian and constructs
+
+$$
+A=-iH-\frac12\sum_\mu L_\mu^\dagger L_\mu,
+\qquad \ket{\widetilde\psi(t+s)}=e^{As}\ket{\psi(t)}.
+$$
+
+The tilde denotes an unnormalized no-jump state. Dense matrix exponentials are appropriate for these two- and three-dimensional benchmarks. They also avoid assuming that the non-Hermitian generator has a complete, well-conditioned eigenbasis. A production many-body code would replace this operation with sparse propagation or an MPS integrator.
+
+For a normalized state immediately after a jump, define
+
+$$
+S(s)=\|e^{As}\ket\psi\|^2.
+$$
+
+Differentiate and use $A+A^\dagger=-Q$ to obtain
+
+$$
+\frac{dS}{ds}=-\bra{\widetilde\psi(s)}Q\ket{\widetilde\psi(s)}\le0.
+$$
+
+Thus $S$ is a survival probability. Draw $r$ uniformly from $(0,1)$ once, and find the first time at which $S(s)=r$. Indeed,
+
+$$
+\Pr(T>s)=\Pr(r<S(s))=S(s).
+$$
+
+This proves the waiting-time prescription without a small-timestep approximation. If the state has a dark component, $S(s)$ need not approach zero. Some records then have no later jump, which is physically correct.
+
+At the event time, calculate
+
+$$
+w_\mu=\|L_\mu\ket{\widetilde\psi}\|^2,\qquad
+p_\mu=\frac{w_\mu}{\sum_\nu w_\nu},\qquad
+\ket{\psi^+}=\frac{L_\mu\ket{\widetilde\psi}}{\sqrt{w_\mu}}.
+$$
+
+The pre-jump norm is common to all channel weights and cancels from their ratios. After the normalized update, draw a new threshold. These rules give the channel-resolved trajectory ensemble of the Lindblad equation.
+
+### Output times do not reset survival
+
+The program advances to requested output times, checking whether the fixed threshold is crossed in each interval. If it is, bisection locates the event to absolute tolerance $10^{-11}$, the jump is applied, and propagation resumes over the unused part of that interval. Multiple events within one interval are allowed.
+
+Between events, the stored state remains unnormalized. To record $\langle O\rangle$, the code divides $\widetilde\psi^\dagger O\widetilde\psi$ by $\|\widetilde\psi\|^2$. Merely asking for an output value does not renormalize the stored state or redraw the threshold. Resetting either without the corresponding conditional-probability update would change the waiting-time law.
+
+There are two distinct timescales here. The output spacing, $0.05$ in the fluorescence example, controls the plotted resolution. The bisection tolerance controls event location. The no-jump propagation uses a matrix exponential, so there is no Euler propagation error. In an interacting MPS calculation, a third tolerance would enter through its approximate propagator and a fourth through truncation.
+
+## An independent deterministic reference
+
+For every benchmark the code also evolves the density matrix directly:
+
+$$
+\mathcal L(\rho)=-i(H\rho-\rho H)
++\sum_\mu\left[L_\mu\rho L_\mu^\dagger
+-\frac12(L_\mu^\dagger L_\mu\rho+\rho L_\mu^\dagger L_\mu)\right].
+$$
+
+A fourth-order Runge–Kutta step uses
+
+$$
+\begin{aligned}
+k_1&=\mathcal L(\rho),&k_2&=\mathcal L(\rho+h k_1/2),\\
+k_3&=\mathcal L(\rho+h k_2/2),&k_4&=\mathcal L(\rho+h k_3),\\
+\rho(t+h)&=\rho(t)+\frac h6(k_1+2k_2+2k_3+k_4).
+\end{aligned}
+$$
+
+The default maximum substep is $0.002$. This is a different algorithm from averaging pure states, so agreement tests both implementations. RK4 is not exactly positivity preserving for arbitrary step sizes. The program deliberately does not project negative eigenvalues away or normalize the trace after a step: corrections of that kind could hide an integration error. Tests check trace, Hermiticity, positivity to numerical tolerance, and fourth-order timestep convergence.
+
+## Resonance fluorescence
+
+Use the ordered basis $\ket g,\ket e$, with
+
+$$
+H=\frac\Omega2(\ket g\bra e+\ket e\bra g)-\Delta\ket e\bra e,
+\qquad L=\sqrt\gamma\ket g\bra e.
+$$
+
+The initial state is $\ket g$. A detected photon resets the atom to $\ket g$; coherent driving then builds excited-state amplitude again. The parameters in @fig-lab-fluorescence are $\Omega=2$, $\gamma=1$, and $\Delta=0$.
+
+Let $p=\rho_{ee}$ and $v=\operatorname{Im}\rho_{ge}$. On resonance, evaluating the two matrix equations gives
+
+$$
+\dot p=\Omega v-\gamma p,\qquad
+\dot v=\frac\Omega2(1-2p)-\frac\gamma2v.
+$$
+
+These equations have damped oscillations and a stationary population
+
+$$
+p_{\mathrm{ss}}=\frac{\Omega^2}{\gamma^2+2\Omega^2}.
+$$
+
+For the chosen parameters this is $4/9$. The long-time average is below $1/2$, even though an individual conditional path can approach unit excitation before a photon is detected.
+
+![Resonance fluorescence from the Julia laboratory. Top: three conditional excited-state populations, sampled on the output grid; the plotted connecting lines resolve jumps only to that grid. Bottom: the mean of 4,096 independent trajectories and an independent RK4 master-equation solution. Shading is a pointwise normal-approximation interval of plus or minus 1.96 estimated standard errors, not a simultaneous confidence band. Parameters: Omega/gamma = 2, Delta = 0, initial ground state.](figs/fluorescence.png){#fig-lab-fluorescence width=95%}
+
+The individual records are physically different. Their jumps need not resemble the smooth unconditional decay. Their mean is the quantity that can be compared to $\operatorname{Tr}(n_e\rho)$. The shaded intervals need not contain the reference at every plotted time: adjacent times are correlated, and a pointwise interval does not provide simultaneous coverage of the whole curve.
+
+## Measure Monte Carlo error honestly
+
+For one fixed observable and time, let $X_m=\langle\psi_m|O|\psi_m\rangle$ for independent records. The estimators are
+
+$$
+\overline X=\frac1M\sum_mX_m,\qquad
+s^2=\frac1{M-1}\sum_m(X_m-\overline X)^2,\qquad
+\mathrm{SEM}=\frac{s}{\sqrt M}.
+$$
+
+The $M^{-1/2}$ law follows directly from independence:
+
+$$
+\operatorname{Var}(\overline X)=\frac1{M^2}\sum_m\operatorname{Var}(X_m)
+=\frac{\sigma^2}{M}.
+$$
+
+To reduce an error by a factor of ten therefore requires about one hundred times more trajectories. Reusing one long trajectory at closely spaced times does not create the same number of independent samples.
+
+For @fig-lab-sampling, the code fixes $t\gamma=4$ in advance, divides the 4,096 fluorescence records into disjoint groups of $M$ records, and computes one mean per group. Their root-mean-square discrepancy from the master-equation result estimates the error of an $M$-record calculation. The comparison line uses the single-record standard deviation estimated from the full pool.
+
+![Monte Carlo scaling at the preselected time t gamma = 4. Each marker is the root-mean-square error of disjoint group means relative to the deterministic reference. The dashed line is the estimated single-trajectory standard deviation divided by the square root of M. Group counts are shown explicitly. The largest M has only eight groups, so its RMSE estimate fluctuates appreciably. Different markers reuse the same pool through different partitions and are not independent experiments.](figs/sampling-scaling.png){#fig-lab-sampling width=85%}
+
+A sample variance can be misleading for rare events. At very early fluorescence times a modest ensemble may contain no jumps. Every sampled path then has the same observable, producing a zero empirical SEM even though a rare unsampled jump has nonzero probability. Zero observed variance is not proof of an exact result. Increase the sample size, examine event counts, or use an analytically justified rare-event bound when that regime matters.
+
+The uncertainty of a nonlinear quantity requires additional care. To estimate purity, for example, $\operatorname{Tr}[(\mathbb E\rho_\psi)^2]$ is not $\mathbb E\operatorname{Tr}(\rho_\psi^2)$, which is identically one for pure trajectories. For fitted rates and ratios, recompute the whole estimator in independent batches or a suitable bootstrap; propagating a pointwise SEM as though all times were independent is generally incorrect.
+
+## Hard-core lattice dephasing
+
+Take a single particle on two sites, with basis $\ket{10},\ket{01}$:
+
+$$
+H=-J\begin{pmatrix}0&1\\1&0\end{pmatrix},\qquad
+L_1=\sqrt\gamma\begin{pmatrix}1&0\\0&0\end{pmatrix},\quad
+L_2=\sqrt\gamma\begin{pmatrix}0&0\\0&1\end{pmatrix}.
+$$
+
+The two jumps correspond to site-resolved density monitoring. They preserve particle number. Since $L_1^\dagger L_1+L_2^\dagger L_2=\gamma I$ in this sector, the no-jump norm decays as $e^{-\gamma t}$ regardless of the state. The normalized no-jump motion is unitary hopping. A jump localizes the particle on a detected site, after which hopping rebuilds a superposition.
+
+Choose the symmetric initial state $\ket+=(\ket{10}+\ket{01})/\sqrt2$. Its density matrix can be written
+
+$$
+\rho(t)=\frac12\left[I+e^{-\gamma t}\sigma_x\right].
+$$
+
+This is an exact solution: $H=-J\sigma_x$ commutes with this matrix, while the dissipator damps its off-diagonal entries at rate $\gamma$. Consequently,
+
+$$
+\operatorname{Re}\langle b_1^\dagger b_2\rangle
+=\frac12e^{-\gamma t},\qquad
+\langle n_1\rangle=\langle n_2\rangle=\frac12.
+$$
+
+This benchmark separates loss of coherence from loss of particles. Density remains uniform while interference contrast disappears.
+
+![Intersite coherence of one hard-core particle, initially in the symmetric state, with J = gamma = 1 and local density jumps. The analytic exponential, independent master-equation integration, and 4,096-trajectory estimate agree within sampling fluctuations. Shading is plus or minus 1.96 estimated standard errors. This is a two-site benchmark, not a simulation of the review's larger lattice examples.](figs/dephasing.png){#fig-lab-dephasing width=85%}
+
+## A lossy level and continuous Zeno suppression
+
+For a final benchmark enlarge the basis to $\ket a,\ket b,\ket{\mathrm{vac}}$, and take
+
+$$
+H=-J(\ket a\bra b+\ket b\bra a),\qquad
+L=\sqrt\Gamma\ket{\mathrm{vac}}\bra b.
+$$
+
+The particle starts in $\ket a$. The vacuum must be included because the jump changes particle number. Before a jump, the amplitudes satisfy
+
+$$
+\dot a=iJb,\qquad \dot b=iJa-\frac\Gamma2b.
+$$
+
+If $\Gamma\gg J$, the lossy amplitude relaxes rapidly. Setting $\dot b\simeq0$ gives $b\simeq2iJa/\Gamma$, and hence
+
+$$
+\dot a\simeq-\frac{2J^2}{\Gamma}a,\qquad
+P_{\mathrm{surv}}(t)\simeq e^{-4J^2t/\Gamma}.
+$$
+
+This elimination describes times beyond the initial transient $1/\Gamma$. It explains the counterintuitive protection: a very rapidly emptied intermediate state is hard to populate. The effective population-loss rate decreases as $1/\Gamma$.
+
+![Survival probability outside the vacuum for the lossy two-level subsystem, obtained by direct master-equation integration with J = 1. Increasing Gamma beyond the coherent tunneling scale suppresses transfer to the lossy state. The dashed strong-loss approximation is shown only for Gamma/J = 80. These are original deterministic benchmark calculations, not experimental data.](figs/zeno.png){#fig-lab-zeno width=85%}
+
+The code uses a smaller RK4 substep when $\Gamma$ is large, because the fast decay mode still constrains numerical stability even though the observed survival becomes slow. A slow physical signal does not imply that an explicit integrator can ignore the fastest mode.
+
+## What the tests establish
+
+The supplied suite has 20 assertions in three groups. It verifies generator trace preservation and Hermiticity; reference trace, positivity, and fourth-order convergence; the analytic exponential waiting law; monotonic survival and bounded probabilities; event-time invariance under changing the output grid; correct branching frequencies for unequal jump rates; fluorescence ensemble agreement at preselected times; a dark state; particle loss into the vacuum; and the analytic dimer coherence.
+
+The ensemble comparisons use a tolerance of six estimated SEMs plus a small numerical floor, with fixed seeds. This is a practical regression test for a stochastic teaching code, not a universal certification of every rare-event observable or an exact probabilistic guarantee. Its purpose is to expose mistakes such as a missing square root in $L$, an incorrect channel probability, a norm reset at an output time, or omission of the vacuum sector.
+
+To extend the laboratory, first add a small model with a deterministic reference. Check symmetries and exact limiting cases before increasing its size. Only then replace the dense state representation by a compressed many-body method. A complicated simulation should inherit this simple set of independently verified operations.
+
+## Worked exercises
+
+### Exercise: waiting for one spontaneous photon
+
+Remove the drive and start in $\ket e$. Show that there is at most one jump, and calculate its mean waiting time.
+
+::: {.callout-note collapse="true" title="Solution"}
+The unnormalized excited amplitude is $e^{-\gamma t/2}$, so survival is $e^{-\gamma t}$. The threshold gives $T=-\log r/\gamma$, an exponential random variable with mean $1/\gamma$. The jump maps the state to $\ket g$, where the jump rate vanishes. The test suite compares the sampled event time directly to this formula using the same first RNG draw.
+:::
+
+### Exercise: unequal detector channels
+
+Suppose $L_1=\sqrt{\gamma_1}\ket g\bra e$ and $L_2=\sqrt{\gamma_2}\ket g\bra e$. Find the waiting rate and probability that the first click is in channel 2.
+
+::: {.callout-note collapse="true" title="Solution"}
+The total decay rate is $\gamma_1+\gamma_2$. Conditional on a click, the shared excited population cancels, giving $p_2=\gamma_2/(\gamma_1+\gamma_2)$. Both channels leave the same atomic state, but their recorded labels differ. The tests use rates 1 and 3 and check a channel-2 frequency near $3/4$.
+:::
+
+### Exercise: particle-number loss
+
+Use `loss_dimer(gamma=1.0)` and start with one particle. Explain why $\langle N(t)\rangle=e^{-t}$ is independent of the tunneling $J$ when both sites lose particles equally.
+
+::: {.callout-note collapse="true" title="Solution"}
+Hopping commutes with $N$. With $L_j=\sqrt\gamma b_j$, the adjoint dissipator gives $\mathcal L^\dagger(N)=-\gamma N$. Therefore $d\langle N\rangle/dt=-\gamma\langle N\rangle$. A record has $N=1$ until its first loss and $N=0$ afterwards; averaging this survival indicator gives the same exponential.
+:::

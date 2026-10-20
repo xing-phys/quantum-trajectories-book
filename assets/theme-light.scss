@@ -1,5 +1,12 @@
+/*-- scss:defaults --*/
+$primary: #12677a;
+$link-color: #096f91;
+$body-color: #20303c;
+$body-bg: #fdfcf8;
+$font-family-sans-serif: "Source Sans Pro", "Segoe UI", sans-serif;
+$headings-font-family: "Source Sans Pro", "Segoe UI", sans-serif;
+$font-size-base: 1.06rem;
+$sidebar-bg: #f3f4ee;
 /*-- scss:rules --*/
-
-.navbar-title {
-  font-weight: 600;
-}
+.navbar-title { font-weight: 600; }
+h1, h2, h3 { color: #173d50; }

@@ -1,0 +1,124 @@
+# Notation and mathematical toolkit {#sec-notation}
+
+This appendix collects the conventions used throughout the book and supplies a few identities that make the derivations easier to check. It is a reference sheet rather than an additional prerequisite.
+
+## Units and rates
+
+We set $\hbar=1$ in equations of motion. Consequently an energy such as $J$, $U$, or $\Omega$ is also an angular frequency. Restoring dimensions means replacing $-i[H,\rho]$ by $-i[H,\rho]/\hbar$ and $H_{\mathrm{eff}}$ by $H-i\hbar\sum_\mu L_\mu^\dagger L_\mu/2$. A coherent frequency $f$ quoted in cycles per second corresponds to angular frequency $\omega=2\pi f$. An exponential decay constant such as $\Gamma$ is an inverse-second rate and receives no automatic $2\pi$ conversion; check whether an experimental linewidth means $\Gamma$ or $\Gamma/(2\pi)$.
+
+| Symbol | Meaning and convention |
+|:--|:--|
+| $\rho$, $\rho_c$ | Unconditional and measurement-conditioned density operators. |
+| $\ket\psi$, $\ket{\widetilde\psi}$ | Normalized conditional state and unnormalized no-jump state. |
+| $H$, $H_{\mathrm{eff}}$ | Hermitian system Hamiltonian and $H-\frac i2\sum_\mu L_\mu^\dagger L_\mu$. |
+| $L_\mu$ | Jump operator including the square root of its rate; dimension $\mathrm{time}^{-1/2}$. |
+| $\mathcal D[L]\rho$ | $L\rho L^\dagger-\{L^\dagger L,\rho\}/2$. |
+| $\mathcal L$ | Full linear master-equation generator, $\dot\rho=\mathcal L\rho$. |
+| $\mathcal L^\dagger$ | Adjoint generator for observables. |
+| $\gamma,\kappa,\Gamma$ | Decay or scattering rates; the channel and normalization are stated locally. |
+| $J$, $U$ | Nearest-neighbor hopping and on-site interaction in a Hubbard model. |
+| $b_i$, $a_i$, $c_i$ | Bosonic, hard-core, or fermionic annihilation operators, specified in each model. |
+| $n_i$ | Local number operator. |
+| $R$ or $M$ | Number of independent trajectories, defined within each chapter. |
+| $L$ or $M$ | Number of lattice sites, defined within each model; not the trajectory count in the same calculation. |
+| $\chi$ | MPS bond dimension. |
+| $dN_\mu$, $dW$ | Counting increment and real Wiener increment. |
+| $\langle O\rangle_c$ | $\operatorname{Tr}(O\rho_c)$ or $\langle\psi|O|\psi\rangle$ in a pure conditional state. |
+| $\mathbb E[X]$ | Average over stochastic records. |
+
+A frequent convention in the literature is $\gamma(2c\rho c^\dagger-\{c^\dagger c,\rho\})$. In this book it is written $\mathcal D[\sqrt{2\gamma}\,c]\rho$. Another common convention is $\gamma\mathcal D[c]\rho=\mathcal D[\sqrt\gamma\,c]\rho$. Comparing the symbols $\gamma$ alone is insufficient. Compare the complete dissipator or a measurable decay law.
+
+For $L=\sqrt\gamma\,\ket g\bra e$, excited-state *population* decays at $\gamma$, and the coherence $\rho_{eg}$ decays at $\gamma/2$. For $L=\sqrt\gamma\,n$ with $n=\ket e\bra e$, populations are constant and $\rho_{eg}$ decays at $\gamma/2$. For a coherence between two distinct occupied sites subject to independent site measurements $L_i=\sqrt\gamma\,n_i$, both endpoints contribute and its decay rate is $\gamma$.
+
+## Trace, partial trace, and vectorization
+
+For finite-dimensional matrices, $\operatorname{Tr}(AB)=\operatorname{Tr}(BA)$ whenever the products are defined. More generally the trace is cyclic, but the factors cannot be arbitrarily permuted. This distinction accounts for many signs and orderings in master-equation manipulations.
+
+Let $\{|i\rangle_S\}$ and $\{|\alpha\rangle_B\}$ be orthonormal bases. The reduced state is
+
+$$
+(\rho_S)_{ij}=\sum_\alpha\langle i,\alpha|\rho_{SB}|j,\alpha\rangle.
+$$
+
+It is constructed to satisfy $\operatorname{Tr}_S(O\rho_S)=\operatorname{Tr}_{SB}[(O\otimes I_B)\rho_{SB}]$ for every system observable $O$. A partial trace therefore discards inaccessible correlations without changing the predictions of accessible observables.
+
+A useful implementation identity stacks the *columns* of a matrix into a vector:
+
+$$
+\operatorname{vec}(A\rho B)=(B^T\otimes A)\operatorname{vec}(\rho).
+$$ {#eq-notation-vectorization}
+
+To verify it, examine a component: $(A\rho B)_{ij}=\sum_{k\ell}A_{ik}\rho_{k\ell}B_{\ell j}$. The transpose in the Kronecker product follows directly from the order of $\ell,j$; it is not a Hermitian conjugate. For a time-independent finite-dimensional master equation, the corresponding matrix generator is
+
+$$
+\begin{split}
+\mathbf L={}&-i(I\otimes H-H^T\otimes I)\\
+&+\sum_\mu\left[L_\mu^*\otimes L_\mu
+-\tfrac12 I\otimes Q_\mu-\tfrac12 Q_\mu^T\otimes I\right],
+\qquad Q_\mu=L_\mu^\dagger L_\mu.
+\end{split}
+$$ {#eq-notation-liouvillian-matrix}
+
+This expression is helpful for small benchmarks. It acts on a vector of dimension $D^2$, so it does not remove the memory cost that motivates trajectories. The identity row vector is a left zero mode because the trace is conserved. The laboratory instead evaluates the operator products directly for its small benchmarks.
+
+## Operator identities used repeatedly
+
+The commutator product rule is $[A,BC]=[A,B]C+B[A,C]$. For bosons, $[b_i,b_j^\dagger]=\delta_{ij}$ gives $[n_i,b_j]=-\delta_{ij}b_j$. Fermionic operators obey $\{c_i,c_j^\dagger\}=\delta_{ij}$, while the number operator still has $[n_i,c_j]=-\delta_{ij}c_j$.
+
+For Hermitian $L$, expand the double commutator to obtain
+
+$$
+\mathcal D[L]\rho=-\tfrac12[L,[L,\rho]].
+$$
+
+For arbitrary $L$, moving factors cyclically under the trace gives
+
+$$
+\mathcal D^\dagger[L]O
+=L^\dagger O L-\tfrac12\{L^\dagger L,O\}
+=\tfrac12\left(L^\dagger[O,L]+[L^\dagger,O]L\right).
+$$ {#eq-notation-adjoint-identity}
+
+If $N$ counts particles and $[N,L]=-mL$, then $L$ removes $m$ particles. Substituting $O=N$ in @eq-notation-adjoint-identity gives
+
+$$
+\left.\frac{d\langle N\rangle}{dt}\right|_L=-m\langle L^\dagger L\rangle.
+$$
+
+The right side is the event rate multiplied by particles removed per event. For $L=\sqrt\kappa\,b^m$, the event rate is $\kappa\langle n(n-1)\cdots(n-m+1)\rangle$. Factorials appear because different authors choose to place them in $L$ or in the reported coefficient; the loss chapter specifies its convention explicitly.
+
+## A small probability toolkit
+
+For an event with instantaneous rate $\lambda(t)$, the probability of no event in $[0,t]$ obeys $\dot S=-\lambda(t)S$. Thus
+
+$$
+S(t)=\exp\!\left[-\int_0^t\lambda(s)\,ds\right],\qquad
+w(t)=\lambda(t)S(t).
+$$
+
+For a time-independent Poisson process $w(t)=\lambda e^{-\lambda t}$. In quantum jumps, $\lambda(t)$ is evaluated in the evolving normalized conditional state; it generally changes with time and depends on the previous record. A single constant-rate Poisson distribution does not describe an arbitrarily driven quantum emitter.
+
+For independent real samples $X_1,\ldots,X_M$, define
+
+$$
+\bar X=\frac1M\sum_rX_r,\quad
+s^2=\frac1{M-1}\sum_r(X_r-\bar X)^2,\quad
+\operatorname{SE}(\bar X)=\frac{s}{\sqrt M}.
+$$
+
+The last quantity estimates uncertainty in the *mean*, not the spread of individual records. For large $M$ and finite variance, a roughly Gaussian confidence interval often follows from the central limit theorem. For rare events or small samples, the Gaussian approximation may be poor. Observations at many times on the same trajectory are correlated and cannot be counted as independent trajectories.
+
+If the event probability of interest is $p\ll1$, an event-count estimator has relative uncertainty approximately $1/\sqrt{Mp}$. Resolving rare events can therefore require many more records than estimating a typical bounded expectation value. A confidence band drawn separately at each time is pointwise; simultaneous confidence over an entire time trace requires a different construction.
+
+## Singular values and entanglement
+
+Given a bipartition with amplitudes $\Psi_{ab}$, write the matrix singular-value decomposition $\Psi=USV^\dagger$. It becomes a Schmidt decomposition
+
+$$
+|\psi\rangle=\sum_\alpha s_\alpha|\alpha\rangle_A|\alpha\rangle_B,
+\qquad s_\alpha\ge0,\quad \sum_\alpha s_\alpha^2=1.
+$$
+
+The reduced eigenvalues are $s_\alpha^2$, and the entanglement entropy is $-\sum_\alpha s_\alpha^2\log s_\alpha^2$. Keeping the largest $\chi$ values minimizes the unnormalized squared vector error at that bond; the discarded weight is $\sum_{\alpha>\chi}s_\alpha^2$. After normalization, the truncated vector has overlap $\sqrt{1-\epsilon}$ with the original if the discarded weight is $\epsilon$. A local optimal truncation does not by itself guarantee that an entire long time evolution is accurate: its effect must be assessed by increasing $\chi$ and refining the propagation.
+
+The density operator of a mixture has a different entropy from the average pure-state entanglement in a trajectory ensemble. Both can be useful, but they answer different questions. A representation of one $\rho$ by several different ensembles makes this distinction concrete.

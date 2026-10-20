@@ -1,0 +1,57 @@
+# Coverage of the Daley review {#sec-review-map}
+
+This map audits scientific scope against the table of contents of @Daley2014, using the publicly available arXiv manuscript (v1, 26 May 2014). The published journal article is *Advances in Physics* **63**, 77–149 (2014). The section labels below refer to the review, not to this book's chapter numbering.
+
+Coverage means that the scientific methods, assumptions, and classes of applications are explained in original prose and derivations. The review's individual experimental images and numerical plots remain in their cited publications; this book supplies original explanatory figures and reproducible benchmark calculations. The bibliography is selective, with primary sources at the point of use rather than a duplication of the review's entire reference list.
+
+## Foundations and algorithms
+
+| Review section | Topics developed here | Book destination |
+|:--|:--|:--|
+| I A | Reduced states, decoherence, environmental control, relevance across platforms | [Foundations](01-foundations.qmd) |
+| I B | Many-body correlations, quantum simulation, heating and engineered reservoirs | [Foundations](01-foundations.qmd), [microscopic models](07-microscopic-models.qmd) |
+| I C | Scope, assumptions, and learning route | [Welcome](index.qmd) |
+| II A | System, bath, interaction, reduced dynamics | [Master equations](02-master-equations.qmd) |
+| II B | Born, Markov, rotating-wave and secular approximations; timescale separation and limitations | [Master equations](02-master-equations.qmd), [measurement](04-measurement.qmd) |
+| II C | Lindblad generator, rate convention, complete positivity, adjoint dynamics | [Master equations](02-master-equations.qmd) |
+| III A | First-order Monte Carlo wavefunction algorithm and proof of ensemble equivalence | [Trajectories](03-quantum-trajectories.qmd) |
+| III A 1 | Single-time linear observables and sampling a mixed initial state | [Trajectories](03-quantum-trajectories.qmd) |
+| III A 2 | Quantum regression, four-state polarization, doubled-state propagation | [Trajectories](03-quantum-trajectories.qmd) |
+| III B 1 | Sample variance, standard error, convergence, independent numerical biases | [Trajectories](03-quantum-trajectories.qmd), [laboratory](12-computational-lab.qmd) |
+| III B 2 | Global versus local observables, self-averaging, and the relevant thermodynamic limit | [Trajectories](03-quantum-trajectories.qmd) |
+| III C | Conditional evolution, detection records, no-click information, unraveling dependence | [Measurement](04-measurement.qmd) |
+| III D | Norm-threshold waiting times, higher-order propagation, event localization | [Trajectories](03-quantum-trajectories.qmd), [laboratory](12-computational-lab.qmd) |
+| III E 1 | Driven atom, optical Bloch equations, damping and fluorescence correlations | [Worked examples](05-worked-examples.qmd), [laboratory](12-computational-lab.qmd) |
+| III E 2 | Hard-core bosons, local dephasing, energy decay, single-particle correlations and fermion mapping | [Worked examples](05-worked-examples.qmd) |
+
+## Many-body methods and AMO applications
+
+| Review section | Topics developed here | Book destination |
+|:--|:--|:--|
+| IV A | Basis representations, exact/sparse propagation, changing particle sectors | [Many-body numerics](06-many-body-numerics.qmd) |
+| IV B | Time-dependent Gutzwiller product states, conditional local generators, limitations | [Many-body numerics](06-many-body-numerics.qmd) |
+| IV C | Schmidt decomposition, MPS, canonical form, TEBD/t-DMRG, truncation and entanglement | [Many-body numerics](06-many-body-numerics.qmd) |
+| IV D | Nonunitary gates and jumps in MPS, normalization, symmetries, trajectory entanglement and error control | [Many-body numerics](06-many-body-numerics.qmd) |
+| V A | Continuum field theory, Wannier projection, Hubbard parameters and microscopic dissipators | [Microscopic models](07-microscopic-models.qmd) |
+| V B | Electronic elimination, recoil and spatial resolution, interband transitions, red/blue traps, coherence versus energy, interacting bosons and fermions, anomalous relaxation and thermalization | [Light scattering](08-light-scattering.qmd) |
+| V C | Event and particle-loss rates, microscopic correlation dependence | [Particle loss](09-particle-loss.qmd) |
+| V C 1 | Adiabatic elimination and continuous quantum Zeno constraints | [Particle loss](09-particle-loss.qmd), [laboratory](12-computational-lab.qmd) |
+| V C 2 | Two-body loss, molecules, dissipative correlations and the strong-loss regime | [Particle loss](09-particle-loss.qmd) |
+| V C 3 | Three-body recombination, constrained bosons, pairing, metastability and preparation | [Particle loss](09-particle-loss.qmd) |
+| V C 4 | Local single-particle loss, transport and measurement backaction | [Particle loss](09-particle-loss.qmd) |
+| V D | Immersion and Raman cooling, dark-state accumulation, number-conserving condensate preparation, fermionic pairing, topology, competing coherent dynamics | [Reservoir engineering](10-reservoir-engineering.qmd) |
+| V E | Dissipative ions, Rydberg gases, collective clocks, cavity/Dicke physics, photons, optomechanics and non-AMO environments | [Connections](11-connections-outlook.qmd) |
+| VI | What the approach enables and what limits it | [Connections and outlook](11-connections-outlook.qmd) |
+
+## Continuous-measurement appendix
+
+| Review section | Topics developed here | Book destination |
+|:--|:--|:--|
+| A 1 | Traveling bosonic reservoir and interaction Hamiltonian | [Measurement](04-measurement.qmd) |
+| A 2 | Optical, reservoir, coarse-graining and system timescales | [Measurement](04-measurement.qmd), [master equations](02-master-equations.qmd) |
+| A 3 | Short-time system–bath expansion and the second-order vacuum term | [Measurement](04-measurement.qmd) |
+| A 4 | Time-bin increments, commutators, and vacuum Itô rule | [Measurement](04-measurement.qmd) |
+| A 5 | Projecting the output field, conditional states and ensemble averaging | [Measurement](04-measurement.qmd) |
+| A 6 | Physical interpretation, measurement choice, and unresolved environments | [Measurement](04-measurement.qmd) |
+
+The additional prerequisite material, detailed numerical laboratory, imperfect detection, and homodyne overview extend the teaching route. They are identified through their assumptions and do not turn the 2014 case studies into claims about the current experimental frontier.

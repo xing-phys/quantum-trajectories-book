@@ -1,0 +1,206 @@
+# Particle loss and the continuous quantum Zeno effect {#sec-particle-loss}
+
+Loss removes particles, energy, and information. Nevertheless, stronger microscopic loss can sometimes produce a longer-lived gas. The mechanism is dynamical: coherent motion must first populate a lossy configuration, and a very short-lived configuration is difficult to populate. This chapter develops that continuous quantum Zeno effect, then treats the two-, three-, and one-body processes of Section V C of @Daley2014.
+
+## First decide what a quoted loss rate means
+
+For one lattice mode, define a $q$-body jump by
+
+$$
+L^{(q)}=\sqrt{\frac{\kappa_q}{q!}}\,b^q.
+$$ {#eq-loss-qjump}
+
+In the Fock state $\ket n$, its event rate is
+$r_q(n)=\langle L^{(q)\dagger}L^{(q)}\rangle=\kappa_q\binom nq$.
+Thus $\kappa_q$ is the event rate when exactly $q$ particles occupy the mode. Each event removes $q$ particles, so
+
+$$
+\frac{d\langle N\rangle}{dt}
+=-\sum_{i,q}q\kappa_q\left\langle\binom{n_i}{q}\right\rangle.
+$$ {#eq-loss-number-law}
+
+This identity follows either from the adjoint dissipator or from counting the particles removed per jump. It is valid out of equilibrium and includes all correlations through the expectation value. Confusion between event rate, atom-number decay rate, and the coefficient multiplying $b^q\rho b^{\dagger q}$ produces factorial errors. Some papers instead write $L=\sqrt\Gamma b^2$; their pair-state event rate is $2\Gamma$, so in our convention $\kappa_2=2\Gamma$.
+
+In the continuum, define a two-body coefficient $K_2$ through
+$L(\mathbf r)=\sqrt{K_2/2}\,\psi^2(\mathbf r)$. Then
+
+$$
+\frac{d\langle N\rangle}{dt}
+=-K_2\int d^dr\,\langle\psi^{\dagger2}\psi^2\rangle
+=-K_2\int d^dr\,n(\mathbf r)^2g^{(2)}(\mathbf r),
+$$ {#eq-loss-g2}
+
+where $g^{(2)}=\langle\psi^{\dagger2}\psi^2\rangle/n^2$ when $n\ne0$. A fitted density loss coefficient is therefore a product of microscopic reaction physics and many-body pair correlations. Replacing $g^{(2)}$ by one is an assumption about the state, not a property of the reaction.
+
+For cold inelastic collisions, the binding or reaction energy can greatly exceed trap depths and collective energies. If the products leave quickly without secondary collisions and their return amplitude is negligible, they form an approximately memoryless bath. The recycling term transfers probability to sectors with fewer trapped particles. Retaining only the imaginary interaction in $H_{\mathrm{eff}}$ describes a postselected no-loss ensemble; it does not conserve the trace and is not the full density operator.
+
+## Deriving the continuous Zeno effect
+
+Consider a stable configuration $\ket a$ coupled to a lossy configuration $\ket b$ by matrix element $v$. Let $\delta$ be the energy of $b$ relative to $a$, and let $b$ decay with event rate $\Gamma$ into an orthogonal sink. Before a detected loss,
+
+$$
+H_{\mathrm{eff}}=v\ket a\bra b+v^*\ket b\bra a
++(\delta-i\Gamma/2)\ket b\bra b.
+$$
+
+The amplitude equations are $i\dot a=vb$ and
+$i\dot b=v^*a+(\delta-i\Gamma/2)b$.
+When $|v|\ll\sqrt{\delta^2+(\Gamma/2)^2}$ and $a$ changes slowly on the fast relaxation timescale, set $\dot b\simeq0$. Then
+
+$$
+b\simeq-\frac{v^*}{\delta-i\Gamma/2}a,
+\qquad E_{a,\mathrm{eff}}=-\frac{|v|^2}{\delta-i\Gamma/2}.
+$$
+
+Separating its real and imaginary parts gives an energy shift and an effective loss rate,
+
+$$
+\delta E_a=-\frac{|v|^2\delta}{\delta^2+\Gamma^2/4},
+\qquad
+\Gamma_{\mathrm{eff}}=\frac{|v|^2\Gamma}{\delta^2+\Gamma^2/4}.
+$$ {#eq-loss-zeno-rate}
+
+The no-event survival probability is approximately
+$P_0(t)=e^{-\Gamma_{\mathrm{eff}}t}$ after a short initial transient; the probability that at least one event has happened is $1-P_0(t)$. This distinction is useful when interpreting norm decay.
+
+For $\Gamma\gg|\delta|,|v|$, the rate becomes $4|v|^2/\Gamma$. Increasing the bare linewidth suppresses population of the intermediate state and hence suppresses actual loss. If instead $|\delta|\gg\Gamma$, ordinary off-resonant energy blockade gives $\Gamma_{\mathrm{eff}}\simeq|v|^2\Gamma/\delta^2$. Both mechanisms can operate together.
+
+![A slow configuration couples coherently to a short-lived configuration; elimination produces both an energy shift and a reduced loss rate. Original schematic.](figs/zeno-subspaces){#fig-zeno-subspaces width=90%}
+
+![Loss from an initially occupied stable site coupled to a lossy site. Exact no-jump dynamics approaches the inverse-linewidth prediction when the lossy site relaxes much faster than particles enter it. Original numerical illustration; the plotted rate concerns survival of one atom.](figs/zeno){#fig-zeno-app width=90%}
+
+This is a continuous-measurement analogue of repeated projections. Under coherent evolution, a transition probability begins quadratically, $P_b(\tau)\simeq|v|^2\tau^2$. Repeating ideal tests at interval $\tau$ gives a survival probability approximately $\exp(-|v|^2T\tau)$, which tends to one at fixed $T$ as $\tau\to0$. In a lossy implementation the environment continuously distinguishes the unstable occupation; no sequence of instantaneous laboratory projections is required.
+
+Two qualifications matter. An initially occupied lossy state still decays rapidly: protection concerns states that must *enter* it coherently. Also, taking a Markovian rate to infinity beyond the bath bandwidth or band gap invalidates the model. The useful hierarchy is a broad interval in which $\Gamma$ exceeds the coherent entry rate while the microscopic derivation remains valid.
+
+## Two-body loss: molecules, correlations, and hard-core motion
+
+Weakly bound Feshbach molecules can undergo vibrational relaxation in a collision. Reactive ground-state molecules can undergo exothermic chemical reactions. In both cases the outgoing products may have enough energy to leave the trap, giving the same low-energy pair-removal structure. Strong loss-induced correlations were observed with molecular gases by @Syassen2008 and analyzed in lattice models by @GarciaRipoll2009.
+
+The single-band bosonic model in our convention is
+
+$$
+\dot\rho=-i[H_{\mathrm{BH}},\rho]
++\sum_i\mathcal D\left[\sqrt{\kappa_2/2}\,b_i^2\right]\rho,
+\qquad
+H_{\mathrm{eff}}=H_{\mathrm{BH}}-i\frac{\kappa_2}{4}\sum_i n_i(n_i-1).
+$$ {#eq-loss-two-body}
+
+If the initial occupation is at most one per site and $\kappa_2\gg J$, real doublons are rare. On two neighboring occupied sites, hopping connects $\ket{1,1}$ to $\ket{2,0}$ and $\ket{0,2}$, each with $|v|=\sqrt2J$. Each doublon has energy detuning $U$ and linewidth $\kappa_2$. The total event rate for that isolated bond is therefore
+
+$$
+\Gamma_{11\to00}\simeq
+\frac{4J^2\kappa_2}{U^2+\kappa_2^2/4}
+\longrightarrow\frac{16J^2}{\kappa_2}
+\quad(\kappa_2\gg|U|).
+$$ {#eq-loss-bond-rate}
+
+The two paths here are distinct local reservoir channels, and the expression is for a pair of bosons with the stated rate convention. Fermionic spin configurations, collective loss channels, or different definitions of $\kappa_2$ change the prefactor. The characteristic $J^2/\kappa_2$ scaling is the robust Zeno result.
+
+To leading order the remaining coherent dynamics is $PH_{\mathrm{BH}}P$, with $P$ projecting onto $n_i\le1$. These are hard-core bosons: particles may move into empty sites but cannot share one site. In one dimension, a Jordan–Wigner mapping relates hard-core boson density and energy properties to free spinless fermions. Off-diagonal bosonic correlations remain different because the mapping includes a nonlocal string. The resulting fermionized or Tonks-like behavior is generated dynamically here by loss; it need not arise from a large positive elastic interaction.
+
+In a one-dimensional continuum, the same tendency is encoded in a complex contact coupling. Strong inelastic contact physics suppresses the wavefunction at particle coincidence, reducing $g^{(2)}(0)$ and thereby the observed loss in @eq-loss-g2. The environment does not simply remove particles from an otherwise fixed uncorrelated gas: the surviving state changes its local correlations. A spatially uniform rate equation with constant $g^{(2)}$ misses that feedback.
+
+Experiments with lattice-confined reactive molecules support the inverse-loss scaling. Quantitative calibration needs care. @Zhu2014 found that higher-band physics can substantially change an inferred filling fraction even when a single-band treatment captures the qualitative Zeno mechanism. A fit to $J^2/\kappa_2$ is therefore strong evidence for a dynamical bottleneck, but does not by itself validate every parameter of a single-orbital model.
+
+Loss can also select spin symmetry. An $s$-wave-reactive fermion pair is a spin singlet. With an $SU(2)$-invariant Hamiltonian, singlet removal conserves the weight $P_S$ of each total-spin sector. Since $n$ surviving spin-$1/2$ particles cannot carry spin greater than $n/2$,
+
+$$
+\langle N(t)\rangle\ge\sum_S2S P_S.
+$$ {#eq-loss-spin-bound}
+
+For the initially balanced uncorrelated mixtures analyzed by @FossFeig2012, this bound scales as $\sqrt{N_0}$. Saturation gives fully symmetric Dicke spin states among the survivors; it was established for a one-dimensional harmonic trap and numerically supported for a Hubbard chain. Extra dark motional states can prevent saturation, particularly in higher-dimensional separable traps. Spin-dependent dynamics and additional loss channels can invalidate the argument. The survivor scaling is consequently a qualified model result, not a universal law for reactive gases.
+
+Related ideas use strong collisional loss as a dissipative blockade for gates. Distance-selective Rydberg excitation can instead make $L_{ij}\propto b_ib_j$ appreciable only at a chosen separation, producing a constraint on *relative positions* and long-lived bound complexes [@Ates2012].
+
+## Three-body recombination as a three-body constraint
+
+In three-body recombination, two atoms form a molecule and the third carries away part of the released binding energy. When all three products leave the low-energy system, the on-site jump is
+
+$$
+L_i^{(3)}=\sqrt{\kappa_3/6}\,b_i^3,
+\qquad
+H_{\mathrm{eff}}=H_{\mathrm{BH}}
+-i\frac{\kappa_3}{12}\sum_i n_i(n_i-1)(n_i-2).
+$$ {#eq-loss-three-body}
+
+Exactly three atoms on one site have event rate $\kappa_3$. For $\kappa_3\gg J,|U|$ and an initial state with $n_i\le2$, hopping into triply occupied configurations is suppressed. The slow coherent Hamiltonian is again projected, now with $P$ enforcing $n_i\le2$ [@Daley2009].
+
+The residual rate can be checked on one bond. From $\ket{2,1}$, hopping onto the doubly occupied site gives $\ket{3,0}$ with amplitude $\sqrt3J$. The interaction energies before and after are $U$ and $3U$, so $\delta=2U$. Equation @eq-loss-zeno-rate gives
+
+$$
+\Gamma_{21\to00}\simeq
+\frac{3J^2\kappa_3}{4U^2+\kappa_3^2/4}
+\longrightarrow\frac{12J^2}{\kappa_3}.
+$$
+
+In the limit $\kappa_3\gg|U|$, effective jumps within the constrained space can be written, up to a phase, as
+
+$$
+L_{i,\mathrm{eff}}=\sqrt{\frac{12J^2}{\kappa_3}}\,P C_iP,
+\qquad C_i=\frac{b_i^2}{\sqrt2}\sum_{j\in\mathcal N(i)}b_j.
+$$ {#eq-loss-three-effective}
+
+They remove a pair from site $i$ and a neighbor atom after a virtual triply occupied configuration. The coherent sum over neighbors belongs inside a single channel because the reservoir labels the recombination site, not necessarily the neighbor from which its third atom arrived. Nonzero detunings generate both coherent second-order shifts and modified, configuration-dependent jump amplitudes; simply retaining the $U=0$ coefficient then is insufficient.
+
+This creates physics unavailable from a simple two-body hard-core condition. An unconstrained attractive Bose–Hubbard model favors collapse into high occupation. The three-body constraint bounds the local occupation at two and permits mobile dimers without allowing that collapse. At strong attraction, a pair moves through virtual broken-pair configurations with amplitude of order $J^2/|U|$. One can distinguish an atomic superfluid from a pair or dimer superfluid by long-distance correlations:
+
+$$
+G_1(i,j)=\langle b_i^\dagger b_j\rangle,
+\qquad
+G_2(i,j)=\langle b_i^{\dagger2}b_j^2\rangle.
+$$
+
+In a pair superfluid, pair coherence persists while single-particle coherence is short ranged. Mean-field notation expresses this as $\langle b\rangle=0$, $\langle b^2\rangle\ne0$, but an exact fixed-number finite system has both one-point expectations zero. In one dimension, algebraic correlations replace conventional continuous-symmetry long-range order in the usual gapless regimes. These qualifications are essential when comparing mean-field phase diagrams with finite trajectory calculations.
+
+Analytical and numerical work predicts Ising critical behavior between atomic and pair superfluids in suitable regimes, and density-ordered or supersolid behavior in particular strong-coupling settings [@Diehl2010Constraint]. The detailed phase structure depends on dimension, filling, and additional interactions. These are properties of constrained effective models; the lossy physical system realizes them for a useful intermediate lifetime, not automatically as its ultimate stationary state. With loss alone and no replenishment, a fixed finite-density target generally is not the unconditional infinite-time state. Experimental suppression of tunneling into triple occupation was reported in attractive cesium lattices [@Mark2012]; it should not be confused with experimental observation of the entire predicted pair-superfluid phase diagram.
+
+Preparation must fit between two timescales: ramps must be slow enough for relevant coherent gaps, yet fast enough to avoid accumulated residual loss. Preforming dimers in separated superlattice wells and then removing that modulation can reduce dangerous triple occupancy compared with sweeping from repulsion through $U\simeq0$. Trajectories test this by tracking both correlation functions and $P_0$, the probability that no loss occurred. A favorable conditional state with vanishing $P_0$ is a poor preparation protocol.
+
+For three fermionic components, the jump is proportional to $c_{i1}c_{i2}c_{i3}$. Its constraint blocks on-site trimers while allowing two-component pairing. Studies therefore predict stabilization of color-superfluid pairing against trion formation in appropriate attractive mixtures [@Kantian2009]. Extensions discussed in the review include effective constraints in continuum condensates, proposals for Pfaffian-type correlated states, and stabilization of pairing by higher-body restrictions. The common mechanism is controlled exclusion of configurations; establishing any particular phase additionally requires its Hamiltonian, dimensionality, and preparation dynamics.
+
+## Spatially localized one-body loss
+
+An electron beam, resonant optical addressing, or background-gas collisions can remove one atom. For site-resolved Markovian removal,
+
+$$
+\dot\rho=-i[H,\rho]+\sum_i\mathcal D[\sqrt{\kappa_i}\,b_i]\rho,
+\qquad \dot{\langle N\rangle}=-\sum_i\kappa_i\langle n_i\rangle.
+$$
+
+The latter equation is exact but is not closed: the densities depend on the loss strength through transport and correlations. A strongly lossy site can empty rapidly and then inhibit further influx. Eliminating that site produces neighboring effective losses of order $J^2/\kappa_i$, rather than an indefinitely growing sink current. Local removal can also change entanglement, launch density disturbances, or reveal density order; these effects depend on initial correlations and measurement conditioning.
+
+For a weakly depleted condensate, factorizing the field equation gives the dissipative Gross–Pitaevskii equation
+
+$$
+i\partial_t\phi(\mathbf r,t)=
+\left[-\frac{\nabla^2}{2m}+V(\mathbf r)+g|\phi|^2
+-i\frac{\kappa(\mathbf r)}2\right]\phi(\mathbf r,t),
+\qquad \int|\phi|^2d^dr=N(t).
+$$ {#eq-loss-gpe}
+
+It implies $\dot N=-\int\kappa|\phi|^2d^dr$. The imaginary potential reshapes the wavefunction, so a stronger beam can reduce the density where it acts. Localized-loss experiments observed this macroscopic Zeno behavior [@Barontini2013]. The deterministic field equation describes mean density and flow in its regime of validity; it does not by itself represent many-body conditional fluctuations or trajectory entanglement.
+
+Finally, coherent outcoupling into *untrapped atomic modes* can make the escaping atoms an engineered matter-wave reservoir. Near a band edge, or when emitted atoms return coherently, the reservoir need not be Markovian. Collective emission and memory effects can then appear. Large energy release and rapid escape justify simple local removal in the preceding examples; they must be reexamined for this deliberately structured reservoir.
+
+## Exercises with worked guidance
+
+1. **Factorials matter.** A site contains four bosons and has $L=\sqrt{\kappa_3/6}b^3$. Find its event rate and instantaneous atom loss rate.
+
+   *Solution.* The event rate is $4\kappa_3$ and the atom loss rate is $12\kappa_3$. A single jump leaves one atom.
+
+2. **No-loss versus unconditional evolution.** Starting with two particles in one mode, set $H=0$ and use $L=\sqrt{\kappa_2/2}b^2$. Find $\rho(t)$.
+
+   *Solution.* $\rho(t)=e^{-\kappa_2t}\ket2\bra2+(1-e^{-\kappa_2t})\ket0\bra0$. The unnormalized no-jump vector is $e^{-\kappa_2t/2}\ket2$; normalizing it gives $\ket2$, which omits the probability of loss.
+
+3. **Detuning and dissipation.** At fixed nonzero $\delta$, maximize @eq-loss-zeno-rate over $\Gamma$. Explain why its resonant $1/\Gamma$ expression cannot be continued to $\Gamma\to0$.
+
+   *Solution.* The maximum occurs at $\Gamma=2|\delta|$. On resonance, the elimination requires $\Gamma\gg|v|$; small $\Gamma$ instead gives resolved coherent oscillations.
+
+4. **A lossy defect.** A stable mode couples with hopping $J$ to an empty lossy mode of linewidth $\kappa$ and zero detuning. Obtain its effective loss jump.
+
+   *Solution.* For $\kappa\gg J$, the slow jump is $\sqrt{4J^2/\kappa}\,b$ up to phase. Its event rate is $4J^2\langle n\rangle/\kappa$.
+
+5. **Lifetime of a phase.** If $M$ dangerous local configurations each contribute rate $r$, estimate the no-loss probability during a ramp of duration $T$.
+
+   *Guidance.* If their populations are approximately fixed, $P_0\simeq e^{-MrT}$. An inverse bare-loss scaling for each configuration does not remove an extensive system-size penalty. In a real ramp, integrate the conditional total rate over time.

@@ -1,0 +1,126 @@
+# From atomic physics to open lattice models {#sec-microscopic-models}
+
+The formalism of a master equation becomes predictive only after its Hamiltonian and jump operators have been connected to an experiment. This chapter develops that connection for dilute atoms in optical lattices, the principal setting of Section V A of @Daley2014. The same reasoning will support the light-scattering, loss, and reservoir-engineering examples in the next three chapters. We use $\hbar=1$ throughout; an energy therefore has units of inverse time.
+
+## What the field operator describes
+
+An atom has many electronic and nuclear constituents, but a cold collision usually cannot excite its internal structure. If a single internal atomic state is occupied, the remaining degree of freedom is its center-of-mass motion. For bosons the field operator $\psi(\mathbf r)$ removes an atom at $\mathbf r$ and obeys
+
+$$
+[\psi(\mathbf r),\psi^\dagger(\mathbf r')]=\delta(\mathbf r-\mathbf r').
+$$
+
+The corresponding number density is $n(\mathbf r)=\psi^\dagger(\mathbf r)\psi(\mathbf r)$. The delta function means that the field is an operator-valued distribution: local products must be interpreted within a low-energy, regularized theory. We will use the contact interaction as such an effective theory, rather than as a literal microscopic potential at arbitrarily small separation.
+
+At low collision energy, the wavelength of the relative motion is much larger than the range of the interatomic potential. For identical bosons in three dimensions, the leading interaction channel is then $s$-wave scattering. Its low-energy amplitude is specified by a scattering length $a_s$. Away from regimes requiring effective-range corrections or explicit molecular channels, the Hamiltonian is
+
+$$
+H=\int d^3r\,\psi^\dagger(\mathbf r)
+\left[-\frac{\nabla^2}{2m}+V(\mathbf r)\right]\psi(\mathbf r)
++\frac{g}{2}\int d^3r\,\psi^{\dagger 2}(\mathbf r)\psi^2(\mathbf r),
+\qquad g=\frac{4\pi a_s}{m}.
+$$ {#eq-micro-continuum}
+
+The factor $1/2$ avoids counting each pair twice. Indeed, on a normalized single orbital with $n$ bosons, the interaction energy is proportional to $n(n-1)/2$, the number of unordered pairs. Diluteness, usually expressed as $n_{\mathrm{3D}}|a_s|^3\ll1$, controls the separation between atomic and collective length scales. It does not guarantee that particles in a narrow lattice band are weakly correlated: their kinetic energy can be made much smaller than their interaction energy.
+
+For spin-polarized identical fermions, the spatial wavefunction is antisymmetric and vanishes at contact, so this same-species $s$-wave term is absent. Two distinguishable internal states can interact through $s$-wave collisions. A fermionic field $\psi_\sigma$ obeys anticommutation relations, and its leading interaction is $g\int d^3r\,\psi_\uparrow^\dagger\psi_\downarrow^\dagger\psi_\downarrow\psi_\uparrow$. This difference in statistics will matter for both collisional loss and optical pumping.
+
+## Projecting into a Bloch band
+
+A standing-wave optical potential produces a periodic single-particle Hamiltonian. In one direction a standard form is $V_L\sin^2(k_Lx)$, with spacing $a=\pi/k_L$ and recoil energy $E_R=k_L^2/(2m)$. Bloch eigenstates are extended; a unitary change of basis within a band produces localized Wannier orbitals $w_i(\mathbf r)$. If occupation of higher bands is negligible, write
+
+$$
+\psi(\mathbf r)\simeq\sum_i w_i(\mathbf r)b_i,
+\qquad \int d^3r\,w_i^*w_j=\delta_{ij}.
+$$
+
+Insertion into @eq-micro-continuum gives many matrix elements. In a sufficiently deep lattice, orbitals on distant sites have small overlap. Keeping nearest-neighbor hopping and on-site contact interactions gives the Bose–Hubbard Hamiltonian [@Jaksch1998],
+
+$$
+H_{\mathrm{BH}}=-J\sum_{\langle ij\rangle}(b_i^\dagger b_j+b_j^\dagger b_i)
++\frac U2\sum_i n_i(n_i-1)+\sum_i\epsilon_i n_i,
+\qquad n_i=b_i^\dagger b_i.
+$$ {#eq-micro-bh}
+
+Here each undirected bond occurs once, and
+
+$$
+J=-\int d^3r\,w_i^*\left[-\frac{\nabla^2}{2m}+V_L\right]w_j,
+\qquad U=g\int d^3r\,|w_i|^4.
+$$
+
+The smooth trap or an additional superlattice supplies $\epsilon_i$. The sign convention assumes the usual lowest-band Wannier gauge with $J>0$. Lattice depth changes $J$ strongly because tunneling depends on barrier penetration; $U$ changes through orbital compression and through $a_s$. A Feshbach resonance can vary $a_s$, although close to a resonance a one-channel contact description or a single-band projection may cease to be adequate.
+
+The on-site gap to the next vibrational level is approximately $\omega_{\mathrm{gap}}\simeq2\sqrt{V_LE_R}$ in the deep-lattice harmonic approximation. A useful hierarchy is
+
+$$
+J,\ |U|n,\ k_BT,\ \gamma\ \ll\omega_{\mathrm{gap}},
+$$ {#eq-micro-band-hierarchy}
+
+where $\gamma$ denotes a relevant dissipative broadening. This is a sufficient working criterion rather than a universal theorem: occupancy-dependent orbital deformation, deliberately driven interband transitions, and energy-selective loss require additional checks. Optical scattering can violate the assumption of band conservation even when its *rate* is small, because an individual recoil can excite another band.
+
+With two fermionic components the corresponding model is
+
+$$
+H_{\mathrm{FH}}=-J\sum_{\langle ij\rangle,\sigma}
+(c_{i\sigma}^\dagger c_{j\sigma}+\mathrm{H.c.})
++U\sum_i n_{i\uparrow}n_{i\downarrow}
++\sum_{i,\sigma}\epsilon_i n_{i\sigma}.
+$$
+
+Changing lattice geometry changes the graph of bonds. Making barriers very high in two directions produces approximately independent one-dimensional tubes; making them high in one direction produces two-dimensional layers. Mixtures, several orbitals, spin-dependent potentials, and longer-range interactions lead to extended Hubbard models. These are controlled extensions when the omitted processes remain smaller than the effects being studied.
+
+## Why a small imperfection can dominate spin physics
+
+Consider two opposite-spin fermions on neighboring sites at one atom per site and $U\gg J>0$. A single hop temporarily creates a doublon and costs energy $U$. A second hop returns to the singly occupied subspace. Second-order perturbation theory gives an antiferromagnetic exchange Hamiltonian
+
+$$
+H_{\mathrm{spin}}=J_{\mathrm{ex}}\sum_{\langle ij\rangle}
+\left(\mathbf S_i\cdot\mathbf S_j-\frac14\right),
+\qquad J_{\mathrm{ex}}=\frac{4J^2}{U},
+$$ {#eq-micro-exchange}
+
+within that subspace. The spin singlet can access both virtual doublon configurations; the triplet cannot access the same $s$-wave on-site state. Their energy splitting is $4J^2/U$.
+
+This calculation exposes a practical issue. A scattering rate $\gamma\ll J$ may still exceed $J_{\mathrm{ex}}$. A simulator can preserve density dynamics well while losing the spin correlations of interest. One should compare unwanted dissipation with the *smallest physical scale that protects the target phenomenon*, rather than only with a bare hopping energy. The same applies to entropy and temperature: an impressive absolute temperature may remain large relative to a perturbatively generated exchange scale.
+
+## Projecting a dissipative process
+
+The dissipator convention in this book is
+
+$$
+\mathcal D[L]\rho=L\rho L^\dagger-\frac12\{L^\dagger L,\rho\}.
+$$
+
+Rates are included inside $L$. Examples are $L_i=\sqrt\gamma\,n_i$ for local density dephasing and $L_i=\sqrt\kappa\,b_i$ for one-body loss. Their physical meanings differ: the first records density without removing atoms; the second removes one atom per event. Both have a non-Hermitian no-jump contribution $-iL_i^\dagger L_i/2$.
+
+A continuum process must be projected with the same Wannier functions as the Hamiltonian. For example, a local two-body jump proportional to $\psi^2(\mathbf r)$ gives an on-site term proportional to $b_i^2$, weighted by an overlap integral of four Wannier functions. Off-site terms are not forbidden; they are neglected only when their overlaps and experimental effects are demonstrably small. A strong bare loss rate can also distort the short-distance two-particle wavefunction, so projecting first and taking the rate to infinity later need not reproduce the full multiband theory quantitatively.
+
+There is a second locality issue. A bath whose emitted wavelength exceeds the sample size cannot identify the emitting site. Its jump can be collective, such as $\sum_i f_i n_i$ or $\sum_i f_i b_i$, instead of an independent jump at every site. Temporal Markovianity and spatial locality are separate assumptions. A bath can forget quickly in time while coupling many sites coherently.
+
+Technical fluctuations offer another route to dephasing. Suppose the Hamiltonian contains $\xi(t)A$, with $A=A^\dagger$ and classical white noise satisfying $\mathbb E[\xi(t)\xi(t')]=S\delta(t-t')$. Averaging the stochastic unitary evolution gives
+
+$$
+\dot\rho=-i[H,\rho]-\frac S2[A,[A,\rho]]
+=-i[H,\rho]+\mathcal D[\sqrt S A]\rho.
+$$
+
+Spatially correlated lattice-depth noise can therefore produce collective jumps. Colored noise needs its frequency spectrum and generally cannot be replaced by this white-noise expression at every timescale. In addition, varying the depth changes both $J$ and $U$; the resulting noise operator is a derivative of the full Hamiltonian with respect to depth, not automatically a local density.
+
+## Exercises with worked guidance
+
+1. **Contact-interaction factors.** Show that $b^{\dagger2}b^2=n(n-1)$ and explain why a single atom has zero interaction energy in @eq-micro-bh.
+
+   *Solution.* Apply $b^2$ to $\ket n$ to obtain $\sqrt{n(n-1)}\ket{n-2}$, then apply $b^{\dagger2}$. There is no partner with which a single atom can interact.
+
+2. **A useful hierarchy.** Take $U=20J$ and $\gamma=0.3J$. Is $\gamma\ll J$ a sufficient criterion for preserving antiferromagnetic dynamics?
+
+   *Solution.* Here $J_{\mathrm{ex}}=0.2J$, so the dephasing acts faster than the exchange scale. The comparison with $J$ alone is insufficient.
+
+3. **On-site interactions from a Gaussian.** For $w(\mathbf r)=\pi^{-3/4}\ell^{-3/2}\exp[-r^2/(2\ell^2)]$, evaluate $\int|w|^4d^3r$.
+
+   *Solution.* The integral is $1/[(2\pi)^{3/2}\ell^3]$. Stronger confinement increases $U$ by increasing the probability that two atoms overlap.
+
+4. **What does the bath resolve?** Compare $L_i=\sqrt\gamma n_i$ on every site with a single $L=\sqrt\gamma N$, where $N=\sum_i n_i$.
+
+   *Solution.* In a fixed-$N$ sector, $\mathcal D[N]\rho=0$. A measurement of total number gains no information about the arrangement of particles in that sector. Independent local measurements can distinguish arrangements and destroy their coherence.

@@ -2,8 +2,9 @@ project:
   type: book
   output-dir: _site
   resources:
-    - scripts/trajectories.jl
-    - scripts/make_figures.py
+    - scripts/**
+    - data/**
+    - test/**
     - Project.toml
     - LICENSE
 

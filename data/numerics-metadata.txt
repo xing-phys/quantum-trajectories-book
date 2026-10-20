@@ -1,0 +1,6 @@
+Julia version: 1.12.6
+Seed: 20261020; trajectories/model: 4096; BLAS threads: 1
+Fluorescence: Omega=2, gamma=1, Delta=0, t=0:0.05:8
+Dimer: J=1, gamma=1, initial (|10>+|01>)/sqrt(2)
+Method: norm-threshold event bisection, tolerance 1e-11
+Reference: RK4, maximum step 0.002; Zeno max step min(0.002,0.1/Gamma)

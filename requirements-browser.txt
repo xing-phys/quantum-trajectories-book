@@ -1,0 +1,2 @@
+# Optional developer-only browser verification; Chrome must be installed separately.
+playwright==1.64.0

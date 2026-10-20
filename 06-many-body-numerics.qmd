@@ -1,0 +1,346 @@
+# Many-body numerical methods {#sec-many-body-numerics}
+
+A trajectory algorithm needs two operations: propagate a state with a non-Hermitian Hamiltonian, and apply a jump. Both become difficult when the state describes many interacting particles. This chapter develops the three representations discussed in section IV of @Daley2014: a complete many-body basis, a product of local wavefunctions, and a matrix product state (MPS). They make different approximations. Understanding those approximations matters as much as understanding the stochastic sampling.
+
+Throughout, $\hbar=1$ and the rate is part of the jump operator:
+
+$$
+\dot\rho=-i[H,\rho]+\sum_\mu\left(L_\mu\rho L_\mu^\dagger-
+\tfrac12\{L_\mu^\dagger L_\mu,\rho\}\right),\qquad
+H_{\mathrm{eff}}=H-\frac{i}{2}Q,\quad Q=\sum_\mu L_\mu^\dagger L_\mu.
+$$
+
+For example, one-body loss at rate $\kappa$ means $L_j=\sqrt\kappa\,b_j$. A program that inserts another factor of $\kappa$ into its jump probabilities would count the rate twice.
+
+## A complete basis: exact diagonalization
+
+For $L$ sites with $d$ local states, a generic wavefunction has $D=d^L$ complex coefficients. A density matrix has $D^2$. For spinless fermions or hard-core bosons, $d=2$. For soft-core bosons one chooses a maximum occupation $n_{\max}$, so $d=n_{\max}+1$. This last restriction is a physical Hilbert-space truncation that requires its own convergence test.
+
+“Exact diagonalization” (ED) often names the whole family of complete-basis methods, even when a calculation never diagonalizes a matrix. Dense exponentiation is convenient for a two-level benchmark; sparse Krylov propagation is usually preferable for a larger system. To approximate $\exp(-iH_{\mathrm{eff}}\Delta t)\ket\psi$, a Krylov method builds a space spanned by
+
+$$
+\ket\psi,\ H_{\mathrm{eff}}\ket\psi,\ldots,
+H_{\mathrm{eff}}^{m-1}\ket\psi.
+$$
+
+It exponentiates the small projected matrix instead of the full $D\times D$ matrix. Because $H_{\mathrm{eff}}$ is generally non-Hermitian, an Arnoldi construction is appropriate; a Hermitian-only Lanczos routine cannot be substituted without checking its assumptions. Increasing the Krylov dimension or reducing the propagation interval controls the approximation.
+
+The memory advantage of trajectories is immediate, but the total runtime advantage is conditional. One needs $M$ state propagations to obtain an ensemble average. When the density matrix fits easily in memory and high accuracy is required, direct master-equation evolution can win. Conversely, independent trajectories can run on separate processors with almost no communication until their observables are combined.
+
+### Number sectors that change at jumps
+
+For $N$ bosons on $L$ sites without an occupation cutoff, the fixed-number basis has size
+
+$$
+D_N=\binom{N+L-1}{N}.
+$$
+
+For spinless fermions or hard-core bosons it has size $\binom{L}{N}$. Suppose $[H_{\mathrm{eff}},\hat N]=0$ and
+
+$$
+[\hat N,L_\mu]=-p_\mu L_\mu.
+$$
+
+Starting from a number eigenstate, no-jump evolution stays in one sector, while a jump takes $N\mapsto N-p_\mu$. One can therefore propagate in a smaller fixed-number basis, then construct the state in the new basis when a loss occurs. The full ensemble has fluctuating particle number even though each trajectory has a definite number at each instant. This is a major optimization emphasized by @Daley2014.
+
+A jump matrix between sectors is rectangular: its rows label the new basis and its columns the old one. Keep this distinction explicit. Applying a same-sector annihilation matrix can silently erase loss dynamics. The vacuum is a valid absorbing sector, not a reason for the program to divide by a zero jump rate.
+
+Other symmetries need the same care. A translation-invariant generator may have site-resolved jumps that destroy momentum quantum numbers in individual records. A symmetry of the averaged equation does not automatically survive the conditioning on a particular detector outcome.
+
+### Fermionic signs
+
+Choose the ordered occupation basis
+
+$$
+\ket{n_1\ldots n_L}=(c_1^\dagger)^{n_1}\cdots
+(c_L^\dagger)^{n_L}\ket0.
+$$
+
+Then
+
+$$
+c_j\ket{n_1\ldots n_L}
+=(-1)^{\sum_{k<j}n_k}n_j
+\ket{n_1\ldots 0_j\ldots n_L}.
+$$
+
+The sign follows by anticommuting $c_j$ past the occupied creation operators on its left. In a spin representation this is the Jordan–Wigner string,
+
+$$
+c_j=\left[\prod_{k<j}(1-2n_k)\right]\sigma_j^-.
+$$
+
+A fermion loss operator must contain this string when the chosen tensor-product basis requires it. Replacing it by an ordinary bosonic local lowering operator can leave diagonal occupations plausible while corrupting off-diagonal observables. For a fixed ordering the string is a product of local parity operators and can be applied efficiently to an MPS. Boundary hopping on a periodic chain also requires attention to global parity.
+
+## The time-dependent Gutzwiller approximation
+
+The simplest compression assumes a product over sites,
+
+$$
+\ket{\Psi_G}=\bigotimes_{j=1}^L\ket{f_j},\qquad
+\ket{f_j}=\sum_{n=0}^{n_{\max}}f_{j,n}\ket n,\qquad
+\sum_n|f_{j,n}|^2=1.
+$$
+
+There are $L(n_{\max}+1)$ amplitudes instead of $(n_{\max}+1)^L$. The price is the exclusion of all entanglement between sites in each trajectory.
+
+Consider the Bose–Hubbard Hamiltonian
+
+$$
+H=-J\sum_{\langle ij\rangle}(b_i^\dagger b_j+b_j^\dagger b_i)
++\sum_j\left[\frac U2 n_j(n_j-1)+(V_j-\mu)n_j\right].
+$$
+
+Write $b_i=\alpha_i+\delta b_i$, where $\alpha_i=\langle f_i|b_i|f_i\rangle$. Dropping the product $\delta b_i^\dagger\delta b_j$ gives
+
+$$
+b_i^\dagger b_j\longmapsto b_i^\dagger\alpha_j+
+\alpha_i^*b_j-\alpha_i^*\alpha_j.
+$$
+
+Thus the approximate Hamiltonian is a sum of local operators, plus a scalar that changes only an overall phase. Define the neighbor field $\Phi_j=\sum_{i\text{ neighboring }j}\alpha_i$. The relevant local Hamiltonian is
+
+$$
+h_j=-J(\Phi_jb_j^\dagger+\Phi_j^*b_j)
++\frac U2n_j(n_j-1)+(V_j-\mu)n_j.
+$$
+
+The fields must be recomputed from the instantaneous local wavefunctions. Their time dependence makes this a coupled nonlinear approximation, despite each local evolution being a small matrix problem. The same equations follow by projecting the Schrödinger equation onto variations of the product-state manifold.
+
+### No-jump evolution and normalization
+
+Suppose every jump acts on one site, and write $Q_j=\sum_{\mu\text{ on }j}L_\mu^\dagger L_\mu$. A normalized local equation is
+
+$$
+\frac{d}{dt}\ket{f_j}
+=\left[-ih_j-\frac12\left(Q_j-\langle Q_j\rangle_j\right)\right]\ket{f_j}.
+$$ {#eq-gutzwiller-normalized}
+
+Indeed, differentiating $\langle f_j|f_j\rangle$ gives $-\langle Q_j\rangle+\langle Q_j\rangle=0$. A scalar real energy can also be subtracted from $h_j$ as a phase convention. The normalization term does not remove the physical survival probability: that probability must be accumulated separately,
+
+$$
+\frac{d\log P_0}{dt}=-\sum_j\langle Q_j\rangle_j.
+$$
+
+For $p$-body local loss, $L_j=\sqrt\kappa\,b_j^p$, the diagonal quantity is
+
+$$
+Q_j=\kappa n_j^{\underline p},\qquad
+n^{\underline p}=n(n-1)\cdots(n-p+1).
+$$
+
+In coefficients, @eq-gutzwiller-normalized becomes
+
+$$
+\begin{aligned}
+i\dot f_{j,n}={}&\left[\frac U2n(n-1)+(V_j-\mu)n
+-\frac{i\kappa}{2}\left(n^{\underline p}-\langle n^{\underline p}\rangle_j\right)\right]f_{j,n}\\
+&-J\left[\Phi_j\sqrt n\,f_{j,n-1}
++\Phi_j^*\sqrt{n+1}\,f_{j,n+1}\right].
+\end{aligned}
+$$
+
+Coefficients outside the local cutoff are zero. A loss at site $j$ changes only that factor,
+
+$$
+f_{j,n}\longmapsto
+\frac{\sqrt{(n+p)!/n!}\,f_{j,n+p}}
+{\sqrt{\langle n_j^{\underline p}\rangle_j}}.
+$$
+
+The jump intensity is $\kappa\langle n_j^{\underline p}\rangle_j$; the factor $\sqrt\kappa$ cancels from the normalized state update. For dephasing with $L_j=\sqrt\gamma n_j$, the update instead reads $f_{j,n}\mapsto nf_{j,n}/\sqrt{\langle n_j^2\rangle}$.
+
+A spatially collective jump such as $b_i+b_j$ does not generally preserve a product state. Projecting its output back to a product then adds another approximation. Locality of the Lindblad generator alone is insufficient; inspect the actual unraveling being simulated.
+
+### Which correlations survive?
+
+An ensemble of product states has the form
+
+$$
+\rho_{\mathrm{ens}}=\mathbb E_\xi\left[
+\bigotimes_j\ket{f_j(\xi)}\bra{f_j(\xi)}\right].
+$$
+
+It can contain classical correlations, because local wavefunctions depend on a common stochastic record $\xi$. It cannot contain entanglement between sites: it is a mixture of products. By contrast, a product of local density matrices, $\rho_G=\bigotimes_j\rho_j$, cannot represent those classical correlations either.
+
+For example, the equal mixture of $\ket{00}$ and $\ket{11}$ has $\langle n_1n_2\rangle=1/2$ and $\langle n_1\rangle\langle n_2\rangle=1/4$. A product-density approximation loses their difference. This distinction explains why averaging product trajectories can retain more information than independently evolving one local density matrix per site.
+
+There is also a severe dynamical limitation. In a number-product Mott state, every $\alpha_j$ vanishes. The hopping field then vanishes, so the approximation predicts no initial tunneling dynamics under the Bose–Hubbard Hamiltonian. The exact Hamiltonian immediately creates particle–hole pairs. Increasing the trajectory count cannot repair this missing variational direction. Product-state dynamics is most useful where neglected intersite correlations are demonstrably small, and should be checked against complete-basis calculations on small clusters.
+
+## From Schmidt decomposition to matrix product states
+
+An MPS allows controlled entanglement while keeping a local representation. Write a wavefunction as a coefficient tensor $C_{s_1\ldots s_L}$, where $s_j=1,\ldots,d$. Regard the first index as a row and all remaining indices as a column, and perform a singular value decomposition (SVD). Reshape the right factor, split off the next physical index, and repeat. This gives
+
+$$
+C_{s_1\ldots s_L}=A^{[1]s_1}A^{[2]s_2}\cdots A^{[L]s_L},
+$$
+
+where $A^{[j]s_j}$ is a $\chi_{j-1}\times\chi_j$ matrix and $\chi_0=\chi_L=1$. The connecting indices encode correlations between successive blocks. Setting every $\chi_j=1$ recovers the product-state ansatz. Storage is of order $Ld\chi^2$ for approximately uniform bond dimension $\chi$, instead of $d^L$. The historical DMRG construction and subsequent MPS formulation explain why a well-chosen reduced basis can be so effective [@White1992; @Vidal2003].
+
+Across a cut after site $\ell$, the same SVD gives the Schmidt decomposition
+
+$$
+\ket\psi=\sum_{\alpha=1}^{r_\ell}s_\alpha
+\ket{u_\alpha}_A\ket{v_\alpha}_B,
+\qquad s_\alpha\ge0,\quad\sum_\alpha s_\alpha^2=1.
+$$
+
+The reduced density matrix is $\rho_A=\sum_\alpha s_\alpha^2\ket{u_\alpha}\bra{u_\alpha}$. Its entanglement entropy, measured in bits, is
+
+$$
+S_A=-\sum_\alpha s_\alpha^2\log_2s_\alpha^2\le\log_2\chi_\ell.
+$$
+
+The inequality follows because a probability distribution on at most $\chi_\ell$ entries has maximum entropy when it is uniform. Entropy below this bound is necessary for accuracy but is not sufficient: the tail of the Schmidt spectrum determines the actual truncation error.
+
+### Why one-dimensional low-energy states are special
+
+A generic state needs exponentially many Schmidt values, but ground states of local one-dimensional Hamiltonians occupy a much smaller part of Hilbert space. For finite local dimension, bounded short-range interactions, and a unique ground state separated by a system-size-independent nonzero gap, an area-law theorem bounds the entropy across a cut independently of the chain length [@Hastings2007]. In one dimension the boundary has only a fixed number of points. In many practical gapped ground states the Schmidt probabilities also decrease rapidly, so a modest bond dimension captures almost all their weight. The theorem should not be read as a universal exponential formula for every Schmidt spectrum.
+
+Critical states can be harder without becoming generic volume-law states. For an interval of length $\ell$ in an infinite critical chain described by a conformal field theory with central charge $c$,
+
+$$
+S_A=\frac{c}{3\ln2}\ln(\ell/a)+s_0,
+$$
+
+where $a$ is a microscopic length and $s_0$ is a nonuniversal constant in bits [@CalabreseCardy2004]. An interval touching the end of a semi-infinite open chain has half the logarithmic coefficient. Thus critical ground-state entanglement grows only logarithmically with size, although obtaining a fixed accuracy still requires increasing the bond dimension. Neither ground-state statement guarantees efficient long-time evolution after a quench.
+
+### Canonical form and optimal truncation
+
+Gauge transformations $A^{[j]s}\mapsto A^{[j]s}X$ and $A^{[j+1]s}\mapsto X^{-1}A^{[j+1]s}$ leave the represented state unchanged. Use this freedom to make tensors to the left of a chosen center satisfy
+
+$$
+\sum_s(A^{[j]s})^\dagger A^{[j]s}=I,
+$$
+
+and tensors on its right satisfy the corresponding right-orthonormal condition $\sum_s A^{[j]s}(A^{[j]s})^\dagger=I$. In this mixed canonical form, the block states are orthonormal. Local singular values are then genuine Schmidt values; without the orthonormal environments, a naive local SVD need not minimize the global wavefunction error.
+
+Retaining the largest $\chi$ Schmidt values discards weight
+
+$$
+\epsilon_{\mathrm{disc}}=\sum_{\alpha>\chi}s_\alpha^2.
+$$
+
+For this single cut, the normalized retained state has squared overlap $1-\epsilon_{\mathrm{disc}}$ with the original state. To see optimality, note that any retained $\chi$-dimensional left subspace captures at most the sum of the largest $\chi$ eigenvalues of $\rho_A$. The Schmidt vectors attain that maximum. This is the mathematical core of density-matrix truncation.
+
+For a bounded observable, this one normalized truncation obeys
+
+$$
+|\langle O\rangle_\psi-\langle O\rangle_{\mathrm{trunc}}|
+\le 2\|O\|\sqrt{\epsilon_{\mathrm{disc}}}.
+$$
+
+It follows from the trace distance between two pure states. Repeated truncations and nonlinear jump-time changes make long-time errors more complicated; the sum of discarded weights is a diagnostic, not a universal rigorous error bar on every observable. A detailed account of canonical representations is given by @Schollwock2011.
+
+## Time evolution and trajectories with an MPS
+
+For nearest-neighbor interactions split $H_{\mathrm{eff}}=H_o+H_e$ into odd- and even-bond terms, distributing on-site terms consistently. Terms within each set act on disjoint bonds. A symmetric step is
+
+$$
+e^{-iH_{\mathrm{eff}}\Delta t}
+=e^{-iH_o\Delta t/2}e^{-iH_e\Delta t}e^{-iH_o\Delta t/2}
++O(\Delta t^3).
+$$
+
+This local error gives second-order global convergence at fixed final time for bounded generators, before truncation errors are included. Non-Hermiticity does not invalidate the algebraic splitting, but the gates are no longer unitary.
+
+To apply a two-site gate, contract the neighboring tensors into a tensor $\Theta_{\alpha s t\beta}$, act on the physical pair $(s,t)$, reshape $(\alpha s)$ and $(t\beta)$ into matrix indices, and perform an SVD. Retain enough singular values for the requested discarded-weight tolerance, then distribute the factors back into two tensors. This is the TEBD update; adaptive time-dependent DMRG uses the same evolving reduced-space idea [@Vidal2004; @Daley2004; @White2004]. At fixed local dimension, the dominant algebra typically scales cubically with the bond dimension.
+
+A local jump acts on one physical index. It need not immediately increase a bond dimension, but subsequent Hamiltonian evolution of the disturbed state can increase entanglement. Jumps can therefore make an initially easy calculation progressively harder. After a global quench, approximately linear entropy growth $S\sim vt$ requires $\chi\gtrsim2^{vt}$; polynomial cost in $\chi$ becomes exponential cost in accessible time. Dissipation can lower or raise the practical difficulty, depending on the state and unraveling.
+
+### Why a distant local jump can have a delayed effect
+
+For bounded short-range lattice interactions, the Lieb–Robinson bound has the schematic form
+
+$$
+\|[O_x(t),O_y]\|\le C\|O_x\|\|O_y\|
+ e^{-\mu(r-v_{\mathrm{LR}}|t|)},
+$$
+
+with separation $r$ and positive model-dependent constants [@LiebRobinson1972]. It expresses an approximate light cone for dynamical influence. A useful quasiparticle picture is that a local jump creates a disturbance whose excitations spread away from its position. Extra entanglement at a distant cut often develops when those excitations reach it, on a timescale of order $r/v$. Different jump positions and times can therefore produce delayed rises in trajectory entanglement, as illustrated in section IV D of @Daley2014.
+
+This picture has limits. A selective nonunitary jump can immediately reweight correlations that were already present across a distant cut. The bound on commutators does not assert that every postselected entropy remains unchanged until a sharp arrival time. The delay is a physical interpretation useful for local-quench dynamics, rather than a general theorem about all conditioned states.
+
+### Keep the survival probability separate
+
+Canonical algorithms often normalize a state after each local gate. This is numerically sensible, but a norm-threshold trajectory needs the norm that the *untruncated nonunitary evolution* would have produced. Accumulate the logarithms of the physical gate normalization factors. If a gate changes a normalized state to an unnormalized state of norm $q$, add $2\log q$ to $\log P_0$ before renormalizing.
+
+Truncation removes norm for an unrelated reason. Do not interpret discarded Schmidt weight as additional environmental detection probability. Record physical nonunitary norm change and representation error separately, and converge the latter until event statistics are stable. The remaining small truncation error can still affect future intensities indirectly through its change of the normalized state.
+
+A fixed-number block-sparse MPS is particularly effective for loss: update its charge sector after a jump. An inhomogeneous record also suggests nonuniform bond dimensions. Increase $\chi_\ell$ where entanglement develops instead of forcing every bond to the largest value needed anywhere.
+
+## Density matrices, unravelings, and fair comparisons
+
+One can also represent $\rho$ as a matrix product operator (MPO), or vectorize it into an MPS with local dimension $d^2$ [@Verstraete2004; @Zwolak2004]. This removes trajectory sampling error but introduces operator-space truncation. A generic MPO approximation does not automatically preserve positivity; trace and negative eigenvalues must be checked where accessible. Purification-based representations can enforce positivity, with their own computational costs.
+
+Which representation wins depends on the correlations of the actual problem. An MPO must encode classical and quantum correlations in the density operator. A pure-state trajectory may have much less entanglement, but many samples may be needed. Conversely, a highly mixed density matrix may have a compact MPO while a particular ensemble contains highly entangled states. At infinite temperature, for example, the density matrix is proportional to the identity, yet it admits decompositions into both product states and entangled states.
+
+This is why trajectory entanglement is an attribute of the chosen unraveling, not an entanglement measure of $\rho$. Unitary mixing of jump channels preserves the master equation, while changing which information the conditional record supplies. The computational bond dimensions and Monte Carlo variances can change. This freedom does not make all measurement interpretations interchangeable: detector geometry and resolution select the physical unraveling when individual records are the object of study.
+
+## Thermal initial states without a full density matrix
+
+A trajectory calculation can start from a mixed thermal state if its initial pure states are sampled with the correct weights. Minimally entangled typical thermal states (METTS) provide one such construction [@White2009]. Choose a complete orthonormal product basis $\{\ket i\}$ and define
+
+$$
+P_i=\bra i e^{-\beta H}\ket i,\qquad
+\ket{\phi_i}=\frac{e^{-\beta H/2}\ket i}{\sqrt{P_i}},\qquad
+Z=\sum_iP_i.
+$$
+
+Inserting the product-basis identity between the two imaginary-time factors proves
+
+$$
+\frac{e^{-\beta H}}Z
+=\sum_i\frac{P_i}Z\ket{\phi_i}\bra{\phi_i}.
+$$ {#eq-metts-ensemble}
+
+The states are not generally product states after imaginary-time evolution, but their product starting points can keep their entanglement comparatively manageable. Approximate imaginary-time MPS propagation still needs convergence checks.
+
+One need not enumerate all $P_i$. Starting from $\ket i$, prepare $\ket{\phi_i}$, then measure each site in the product basis to choose $\ket j$ with probability $T_{i\to j}=|\langle j|\phi_i\rangle|^2$. Repeat imaginary-time evolution and collapse. Hermiticity of $e^{-\beta H/2}$ gives detailed balance,
+
+$$
+P_iT_{i\to j}
+=|\bra j e^{-\beta H/2}\ket i|^2
+=P_jT_{j\to i}.
+$$
+
+Thus $P_i/Z$ is stationary for this Markov chain [@StoudenmireWhite2010]. At stationarity the sampled states have the desired weights, so their ordinary sample mean estimates thermal observables; multiplying them by $P_i$ again would double-weight them. Equilibration and adequate mixing are essential. Conserved quantities and a poorly chosen collapse basis can prevent exploration of all intended sectors, so one may change local measurement bases or target a specified canonical sector deliberately.
+
+To initialize open evolution, launch Lindblad trajectories from these sampled $\ket{\phi_i}$, with independent environmental noise. Averaging both initial-state and bath samples gives evolution from @eq-metts-ensemble by linearity. Successive METTS samples remain correlated, however: independent photon records do not remove initial-state autocorrelation. Estimate uncertainty with independent chains or batches longer than the relevant correlation time, and distinguish thermal sampling error from subsequent trajectory noise.
+
+## Four independent convergence questions
+
+A convincing numerical result addresses distinct errors separately.
+
+1. **Representation:** increase $n_{\max}$ for bosons; increase the MPS bond dimension or tighten discarded-weight tolerance. Compare several observables, including correlations, rather than entropy alone.
+2. **Propagation:** reduce the timestep, tighten Krylov tolerance, or increase the integrator order. Also tighten event-location tolerance in a threshold algorithm. A denser output grid is not by itself a better integrator.
+3. **Sampling:** increase the independent trajectory count and report the standard error of the mean. It decreases as $M^{-1/2}$ when the variance is finite. It says nothing about the first two errors.
+4. **Finite system size:** vary the number of sites and boundary conditions when drawing bulk or thermodynamic conclusions. This is a physical extrapolation, distinct from accurately solving one finite system.
+
+Use identical random streams for selected individual convergence comparisons when possible. Once small integrator differences shift a jump enough to change later outcomes, pathwise comparisons can diverge even though ensemble statistics remain correct; then compare converged distributions and observables. Rare records can be much more entangled than typical ones, so sample difficult trajectories deliberately. A small test set cannot certify an unexamined tail.
+
+## Worked exercises
+
+### Exercise: a number-conserving propagator with loss
+
+A chain of six hard-core sites starts with three particles. How many coefficients are needed before a one-body jump, and after it? Must the ensemble conserve particle number?
+
+::: {.callout-note collapse="true" title="Solution"}
+The sector dimensions are $\binom63=20$ and $\binom62=15$. Each no-jump segment conserves number, but the jump changes the trajectory sector. The ensemble number decreases; definite number within each trajectory is fully consistent with a broad distribution across trajectories.
+:::
+
+### Exercise: what bond dimension is enough?
+
+The Schmidt probabilities at one cut are $0.8,0.15,0.04,0.01$. Retain two. Find the discarded weight, normalized retained probabilities, and squared overlap.
+
+::: {.callout-note collapse="true" title="Solution"}
+The discarded weight is $0.05$. Retained probabilities become $0.8/0.95$ and $0.15/0.95$. The overlap squared is $0.95$. This statement concerns one optimal truncation at one cut, not the error after a long sequence of TEBD steps.
+:::
+
+### Exercise: why more trajectories cannot fix mean field
+
+Start two Bose–Hubbard sites in $\ket{1,1}$ with no dissipation. Compare the exact first derivative with the product-state hopping field.
+
+::: {.callout-note collapse="true" title="Solution"}
+The hopping Hamiltonian gives $H_J\ket{1,1}=-J\sqrt2(\ket{2,0}+\ket{0,2})$, so the state immediately develops particle–hole amplitudes. Both local order parameters are zero, making the Gutzwiller hopping fields zero. The resulting error is in the variational manifold. Averaging more copies of the same restricted evolution leaves it unchanged.
+:::

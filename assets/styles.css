@@ -1,28 +1,23 @@
-/* Shared styles for the OYA-OQS report site */
-
-/* Slightly larger, clearer display equations */
-.math.display {
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 0.25rem 0;
+/* Shared HTML presentation; equations scroll on narrow screens. */
+:root { --book-accent: #147d92; }
+.quarto-title-block .quarto-title-banner { background: transparent; }
+#title-block-header .title { letter-spacing: -0.035em; line-height: 1.12; }
+main p, main li { line-height: 1.7; }
+main { max-width: 880px; min-width: 0; }
+.math.display { display: block; max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: .4rem 0; }
+.math.inline { white-space: normal; }
+figure figcaption { font-size: .9em; line-height: 1.5; }
+figure img { background: white; border-radius: 5px; }
+div.callout { border-radius: 7px; }
+.sidebar-title { font-weight: 650; letter-spacing: -.02em; }
+pre.sourceCode { border-radius: 6px; }
+table { font-size: .94em; }
+#quarto-margin-sidebar { font-size: .88em; }
+@media (max-width: 650px) {
+  h1 { font-size: 2rem; }
+  main p, main li { line-height: 1.6; }
 }
 
-/* Keep long inline formulas from breaking awkwardly */
-.math.inline {
-  white-space: nowrap;
-}
-
-/* Figure captions */
-figure.quarto-float.tbl figcaption,
-figure.quarto-float.fig figcaption {
-  font-size: 0.9em;
-  line-height: 1.4;
-}
-
-/* Theorem boxes */
-div.callout {
-  border-radius: 6px;
-}
-
-/* Dark mode: SVG figures with dark backgrounds can be dimmed if needed */
-/* .quarto-dark figure svg { filter: brightness(0.85); } */
+/* Keep inactive table-of-contents links readable in dark mode. */
+body.quarto-dark #TOC .nav-link { color: #afc0c9; }
+body.quarto-dark #TOC .nav-link.active { color: #78cbe2; }

@@ -4,7 +4,7 @@
 /.venv/
 /tmp/
 /output/
-*.quarto_ipynb
+**/*.quarto_ipynb
 __pycache__/
 *.pyc
 *.log

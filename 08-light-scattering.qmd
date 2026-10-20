@@ -1,0 +1,186 @@
+# Light scattering: recoil, information, and heating {#sec-light-scattering}
+
+An off-resonant optical lattice is usually described by a conservative potential. The same light also scatters photons. Each scattered photon can change atomic momentum and can carry information about the atomic position. These two effects are related but have different consequences for a many-body state. Following Section V B of @Daley2014, we derive the jump operators and then ask which observables actually diagnose the damage.
+
+## Eliminate the electronic excitation, retain the recoil
+
+Consider one atom with ground state $\ket g$, excited state $\ket e$, and transition linewidth $\Gamma$. In a frame rotating at laser frequency, choose detuning $\Delta=\omega_L-\omega_A$ and Hamiltonian
+
+$$
+H=\frac{p^2}{2m}-\Delta\ket e\bra e
+-\frac12\left[\Omega(\mathbf x)\ket e\bra g+\mathrm{H.c.}\right].
+$$
+
+A photon emitted along unit vector $\mathbf u$ has jump
+
+$$
+L_{\mathbf u}=\sqrt{\Gamma\mathcal N(\mathbf u)}
+e^{-ik_A\mathbf u\cdot\mathbf x}\ket g\bra e,
+\qquad \int d\Omega_{\mathbf u}\,\mathcal N(\mathbf u)=1.
+$$
+
+For a real, linearly oriented dipole $\hat{\mathbf d}$ in free space,
+$\mathcal N(\mathbf u)=3[1-(\hat{\mathbf d}\cdot\mathbf u)^2]/(8\pi)$.
+The exponential is essential: emission changes the atomic momentum by $-k_A\mathbf u$. Absorption momentum is contained in the spatial dependence of $\Omega$.
+
+If electronic excitation is weak and rapid compared with motional evolution, its amplitude follows the ground amplitude. The no-jump equation gives
+
+$$
+c_e\simeq-\frac{\Omega(\mathbf x)}{2(\Delta+i\Gamma/2)}c_g.
+$$
+
+Substituting it back yields a light shift and effective motional jumps. Up to a physically irrelevant common sign of each jump,
+
+$$
+V_{\mathrm{opt}}(\mathbf x)=
+\frac{\Delta|\Omega(\mathbf x)|^2}{4[\Delta^2+(\Gamma/2)^2]},
+\qquad
+\widetilde L_{\mathbf u}=
+\frac{\sqrt{\Gamma\mathcal N(\mathbf u)}\,\Omega(\mathbf x)}
+{2(\Delta+i\Gamma/2)}e^{-ik_A\mathbf u\cdot\mathbf x}.
+$$ {#eq-scatter-elimination}
+
+Thus the local scattering rate is
+$\gamma(\mathbf x)=\Gamma|\Omega(\mathbf x)|^2/[4(\Delta^2+\Gamma^2/4)]$.
+For $|\Delta|\gg\Gamma$, the familiar expressions are
+$V_{\mathrm{opt}}=|\Omega|^2/(4\Delta)$ and
+$\gamma=\Gamma|\Omega|^2/(4\Delta^2)$.
+Red detuning gives an attractive light shift; blue detuning gives a repulsive shift. Real alkali atoms have several excited levels, so quantitative lattice design requires sums over their dipole couplings and detunings. The two-level calculation isolates the mechanism.
+
+## A photon is a position measurement
+
+For a running-wave drive with nearly uniform intensity, absorb its known phase into a momentum transfer $\mathbf q$. The motional jump is proportional to $e^{i\mathbf q\cdot\mathbf x}$. In the position representation, averaging over unobserved emitted directions gives
+
+$$
+\left.\dot\rho(\mathbf x,\mathbf y)\right|_{\mathrm{sc}}
+=\gamma\left[e^{i\mathbf k_L\cdot(\mathbf x-\mathbf y)}
+F\big(k_A(\mathbf x-\mathbf y)\big)-1\right]\rho(\mathbf x,\mathbf y),
+$$ {#eq-scatter-position-kernel}
+
+where
+
+$$
+F(\mathbf z)=\int d\Omega_{\mathbf u}\,\mathcal N(\mathbf u)
+e^{-i\mathbf u\cdot\mathbf z}.
+$$
+
+At coincident points $F(0)=1$: scattering alone does not instantly change the position probability. At separations exceeding the optical resolution scale, the direction-dependent phases average out and off-diagonal coherence decays. In a deliberately simplified isotropic-emission model, $F(\mathbf z)=\sin|\mathbf z|/|\mathbf z|$. Dipole radiation changes the angular dependence, while retaining a resolution set by the wavelength.
+
+This is an unconditional statement. A detector that collects a specified outgoing optical mode instead defines a conditional jump for that mode. The amount and kind of localization in one trajectory depend on the detected information. Irrespective of whether anyone records the photons, their correlations with the atoms reduce atomic coherence after the environment is traced out.
+
+This measurement viewpoint also clarifies interference between initially independent condensates. Suppose two occupied modes start in the number state $\ket{N_L,N_R}$. There is no initial one-body coherence, $\langle b_L^\dagger b_R\rangle=0$. Detecting a *matter-wave particle* at a position where the mode wavefunctions have relative phase $\varphi$ applies a jump proportional to $b_L+e^{i\varphi}b_R$. The resulting state is a coherent superposition of $\ket{N_L-1,N_R}$ and $\ket{N_L,N_R-1}$. Later detections can show a conditional interference pattern even though no definite relative phase was assigned before the record. Averaging over possible records restores the appropriate unconditional state. This example uses destructive atom detection; photon scattering instead acts through density as derived below. Both illustrate why a measurement record and an ensemble average answer different questions.
+
+For many atoms, an emitted plane-wave mode cannot label which atom scattered. In the weak-excitation approximation the jump is a density Fourier component,
+
+$$
+\widetilde L_{\mathbf u}=\frac{\sqrt{\Gamma\mathcal N(\mathbf u)}}
+{2(\Delta+i\Gamma/2)}
+\int d^3r\,\Omega(\mathbf r)e^{-ik_A\mathbf u\cdot\mathbf r}
+\psi^\dagger(\mathbf r)\psi(\mathbf r).
+$$ {#eq-scatter-many-body-jump}
+
+The event rate $\langle\widetilde L_{\mathbf u}^\dagger\widetilde L_{\mathbf u}\rangle$ therefore contains density-density correlations and interference between emitters. It is not generally the atom number times a universal per-atom rate. Bosons occupying the same unresolved region can scatter cooperatively. A complete microscopic treatment also contains coherent radiative dipole-dipole shifts, related to the dispersive part of the electromagnetic Green function. Neglecting those shifts and replacing the spatial kernel by independent site channels is an additional approximation, not part of the definition of spontaneous emission [@Pichler2010].
+
+For example, a resolved-site jump $L_i=\sqrt\gamma n_i$ has event rate $\gamma\langle n_i^2\rangle$, rather than $\gamma\langle n_i\rangle$. Its extra contribution $\gamma\langle n_i(n_i-1)\rangle$ comes from indistinguishable scattering amplitudes within that site. Suppressing multiple occupation therefore changes the rate itself as well as the state's response to an event. This local expression presupposes the specified optical channel model; it should not be substituted into an independently calibrated fluorescence model with distinguishable emitters.
+
+## Band excitation and loss of intersite coherence
+
+In a deep lattice let $x=x_i+\delta x$ within one well and $x_0=\sqrt{1/(2m\omega_{\mathrm{trap}})}$ be its ground-state position width. For a momentum kick $q$,
+
+$$
+e^{iq\delta x}=1+iqx_0(a+a^\dagger)+O((qx_0)^2).
+$$
+
+Starting in the oscillator ground state, the leading probability to reach the first excited state is $(qx_0)^2$. The dimensionless Lamb–Dicke parameter $\eta=k_Ax_0$ therefore controls interband excitation. In the Lamb–Dicke regime, an emission need not change the band: its excitation probability is of order $\eta^2$ after angular averaging.
+
+By contrast, two different lattice sites are separated by approximately half an optical wavelength. A scattered photon can therefore strongly distinguish their locations even when $\eta\ll1$. There is no requirement that dephasing be small whenever band excitation is small. A spatially extended wavefunction can lose its intersite coherence while remaining almost entirely in the lowest band.
+
+For red-detuned standing waves, atoms occupy intensity maxima. Near a minimum of their *potential*, $\Omega(x)$ is approximately constant, so elastic scattering back into the lowest motional state is the dominant channel. For blue-detuned standing waves, atoms sit near intensity nodes. There $\Omega(x)\propto\delta x$, and the leading jump is odd in displacement: it preferentially excites the first odd motional state. The total blue-detuned scattering rate is suppressed by a Lamb–Dicke factor, yet a larger fraction of its events excite another band.
+
+One can see why total energy gain can conceal this distinction. A red-detuned trap has many nearly elastic events and rare events carrying a bandgap energy. A blue-detuned trap has fewer events but a larger typical energy transfer per event. In the ideal two-level standing-wave model, their mean recoil-heating rates at matched lattice depth can agree even though their coherence decay differs strongly [@Pichler2010]. This equality is conditional on that optical model; it is not a general equality between arbitrary red and blue traps.
+
+Moreover, a high-band atom carries energy of order $\omega_{\mathrm{gap}}\gg J,U$. Redistributing that energy among many low-band excitations can require high-order collisions. On an experimentally relevant intermediate timescale, an equilibrium temperature assigned from the *total* deposited energy can therefore misdescribe the low-band gas.
+
+## The local density-dephasing limit
+
+Ignore interband excitation and approximate the bath as resolving individual sites. The master equation becomes
+
+$$
+\dot\rho=-i[H_{\mathrm{BH}},\rho]+\gamma\sum_i\mathcal D[n_i]\rho
+=-i[H_{\mathrm{BH}},\rho]-\frac\gamma2\sum_i[n_i,[n_i,\rho]].
+$$ {#eq-scatter-dephasing}
+
+For any observable $O$, the dissipative adjoint acts as
+$\mathcal D^\dagger[n_i]O=-[n_i,[n_i,O]]/2$.
+Since $[n_i,b_j^\dagger b_k]=(\delta_{ij}-\delta_{ik})b_j^\dagger b_k$, we obtain the exact dissipative contribution
+
+$$
+\left.\frac d{dt}\langle b_j^\dagger b_k\rangle\right|_{\mathrm{sc}}
+=-\gamma(1-\delta_{jk})\langle b_j^\dagger b_k\rangle.
+$$ {#eq-scatter-coherence}
+
+The Hamiltonian still evolves the correlations, so this does not imply an exponential solution for the full interacting problem. The interaction and trap terms commute with every $n_i$, while each hopping term decays at rate $\gamma$ under the dissipator. Consequently,
+
+$$
+\frac d{dt}\langle H_{\mathrm{BH}}\rangle=-\gamma\langle H_{\mathrm{kin}}\rangle,
+\qquad H_{\mathrm{kin}}=-J\sum_{\langle ij\rangle}
+(b_i^\dagger b_j+\mathrm{H.c.}).
+$$ {#eq-scatter-energy}
+
+For the usual states with negative kinetic energy, energy increases. In a fixed particle-number sector of a finite lattice, this dephasing dynamics is unital and the identity in that sector is stationary. It is the unique stationary state only when the coherent and dissipative operators leave no further invariant sectors. Conservation laws and disconnected subspaces must be checked.
+
+The total jump hazard in this unraveling is
+
+$$
+r_{\mathrm{tot}}=\gamma\sum_i\langle n_i^2\rangle
+=\gamma\sum_i\left[\langle n_i\rangle^2+\operatorname{Var}(n_i)\right].
+$$ {#eq-scatter-hazard}
+
+A perfect unit-filled Mott product state on $M$ sites has $r_{\mathrm{tot}}=\gamma M$. A product of coherent states with mean occupation one has Poisson variance one, giving $r_{\mathrm{tot}}=2\gamma M$. A fixed-number condensate with $N=M$ has $r_{\mathrm{tot}}=\gamma M(2-1/M)$ and approaches the same factor of two at large $M$. Thus occupation fluctuations change the event count even at equal mean density. The precise count interpretation is tied to the chosen physical detection channels; alternative mathematical unravelings need not assign identical event records.
+
+## Interactions change the route to heating
+
+A superfluid initially has appreciable off-diagonal one-body correlations, so localization directly damages its order. A Mott state already has suppressed number fluctuations and short-ranged coherence. Tunneling can rebuild a small local correlation after a scattering event; it can therefore appear unusually robust in observables that were already small. Trajectory calculations in one dimension demonstrate this distinction [@Pichler2010]. Robustness of one correlation function is not the absence of entropy production.
+
+Strong interactions also slow the redistribution of occupation probabilities. Consider two number configurations connected by hopping amplitude $v$, with energy difference $\delta E$ and dephasing rate $\gamma_c$ for their coherence. Adiabatic elimination of that coherence gives a classical transition rate
+
+$$
+W=\frac{2|v|^2\gamma_c}{\delta E^2+\gamma_c^2}.
+$$ {#eq-scatter-configuration-rate}
+
+To derive it, write the off-diagonal equation
+$\dot\rho_{ab}=-(\gamma_c+i\delta E)\rho_{ab}-iv(p_b-p_a)$ and set its fast derivative to zero. Substituting into $\dot p_a$ gives $W(p_b-p_a)$. Interaction energies make $\delta E$ occupation dependent; bosonic matrix elements make $v$ occupation dependent as well. Diffusion in number-configuration space is thus highly nonuniform. Power laws and glass-like slow relaxation found in specific strong-coupling models follow from these varying rates, rather than from quenched spatial disorder [@Poletti2012; @Poletti2013]. Their exponents and time windows are model dependent.
+
+After a *single* scattering event, subsequent unitary relaxation poses a different question. Does a plateau agree with a canonical ensemble at the same energy? Numerical calculations reported rapid agreement for several short-distance observables on the superfluid side, and persistent deviations on accessible times on the Mott side [@Schachenmayer2014]. Long-distance correlations, and hence momenta very close to the condensate peak, can relax much more slowly. A plateau is evidence of equilibration of that observable; agreement with a specified ensemble is additional evidence needed for thermalization. These finite-time observations do not prove that an interacting Mott gas never thermalizes.
+
+## Fermions and the bath's spatial resolution
+
+For two fermion species, a photon that resolves only total density gives $L_i\propto n_{i\uparrow}+n_{i\downarrow}$. Within an exactly singly occupied subspace this operator is the identity. Spin coherence is then insensitive to that idealized direct measurement, although virtual doublons, interband transitions, and imperfect spin independence provide other channels. If the bath distinguishes the species, separate jumps $n_{i\uparrow}$ and $n_{i\downarrow}$ reveal spin information and dephase it. Dissipation can then change or generate spin correlations through its interplay with exchange. Pauli exclusion can also block a motional decay when the destination is occupied; the availability of final states must enter the emission calculation.
+
+A useful generalization replaces independent dephasing by
+
+$$
+\mathcal L_{\mathrm{d}}\rho=\sum_{ij}C_{ij}
+\left(n_i\rho n_j-\frac12\{n_jn_i,\rho\}\right),
+\qquad C=C^\dagger\ge0.
+$$
+
+Diagonalizing the positive matrix $C$ gives legitimate collective jump operators. For a single particle, the coherence between sites $j$ and $k$ decays at rate $(C_{jj}+C_{kk}-2\operatorname{Re}C_{jk})/2$. Correlated scattering therefore reduces the distinguishability of nearby sites. This formula connects finite optical resolution continuously to the independent-site approximation.
+
+## Exercises with worked guidance
+
+1. **Density is not immediately heated.** Show that the dissipative part of @eq-scatter-dephasing leaves every $\langle n_j\rangle$ unchanged, yet changes the kinetic energy.
+
+   *Solution.* All number operators commute. A hopping operator changes two site occupations and has the nonzero double commutator used in @eq-scatter-coherence.
+
+2. **Resolve a double well.** For one atom in two sites, let $C_{11}=C_{22}=\gamma$ and $C_{12}=C_{21}=\gamma c$, with $0\le c\le1$. Find the coherence decay rate.
+
+   *Solution.* It is $\gamma(1-c)$. At $c=1$ the bath measures only total number and obtains no which-site information.
+
+3. **A band thermometer can mislead.** A fraction $p$ of atoms receives an energy $\omega_{\mathrm{gap}}$ while the rest remain in the lowest band. Explain why setting a single temperature from energy $pN\omega_{\mathrm{gap}}$ may fail.
+
+   *Guidance.* An equilibrium temperature presupposes redistribution of energy across the relevant degrees of freedom. Compare that redistribution time with the observation time; a rare high-energy population can dominate the total energy without setting low-band correlations.
+
+4. **Interaction-suppressed transitions.** Use @eq-scatter-configuration-rate to find the maximum of $W$ as a function of $\gamma_c$ at fixed nonzero $\delta E$.
+
+   *Solution.* The maximum occurs at $\gamma_c=|\delta E|$. Weak noise broadens an off-resonant transition and increases its rate; sufficiently strong dephasing suppresses coherent transfer again.

@@ -18,7 +18,7 @@ python3 scripts/check_book.py
 quarto preview --no-browser
 ```
 
-The HTML book and combined PDF are written to `_site/`. Quarto prints the preview URL. The sources do not execute numerical calculations while rendering: verified figure assets are committed, so readers can build without Julia or Python plotting packages.
+The HTML book and combined PDF are written to `_site/`. Render all formats for publication: rendering only HTML cleans the previous combined PDF from the output directory. Quarto prints the preview URL. The sources do not execute numerical calculations while rendering: verified figure assets are committed, so readers can build without Julia or Python plotting packages.
 
 ## Reproduce the physics
 
@@ -44,6 +44,17 @@ Generated numerical data and the figure generator are kept with the sources. See
 - `figs/`: original PNG/PDF figures; `scripts/`: reproductions and output checks.
 - `.github/workflows/publish.yml`: validates and builds both formats, then deploys GitHub Pages on pushes to `main`. Pull requests build and check without deploying.
 - `.research/`: ignored local reading copies; the review PDF is not redistributed.
+
+Optional browser checks (using a fresh headless Chrome profile, with Chrome installed):
+
+```sh
+.venv/bin/pip install -r requirements-browser.txt
+python3 -m http.server 4207 --directory _site
+# In another terminal:
+.venv/bin/python scripts/check_browser.py
+```
+
+These check representative MathJax equations, light/dark figure display, JavaScript errors, and mobile width. QA screenshots stay in ignored `.research/`.
 
 ## Editing and publication
 

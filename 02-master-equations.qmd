@@ -1,0 +1,181 @@
+# Markovian master equations {#sec-master-equations}
+
+A master equation closes the dynamics on the reduced density operator. Its usefulness rests on two separate questions: whether it approximates the microscopic experiment, and whether its mathematical evolution preserves physical states. We first derive the relevant approximations and then develop the generator that satisfies the required consistency conditions.
+
+## From a microscopic coupling to a short-memory description
+
+Consider a stationary reservoir state $\rho_E$ and an initially factorized state $\rho_{SE}(0)=\rho(0)\otimes\rho_E$. In the interaction picture, absorb a nonzero reservoir mean $\operatorname{tr}_E(B_\alpha\rho_E)$ into the system Hamiltonian. The interaction then has zero mean. Integrating the von Neumann equation once and substituting it into itself gives a second-order expression. With the Born approximation its reduced form is
+
+$$
+\dot\rho_I(t)=-\int_0^t ds\,
+\operatorname{tr}_E\left[H_I(t),
+\left[H_I(s),\rho_I(s)\otimes\rho_E\right]\right].
+$$ {#eq-born-integral}
+
+This equation is accurate to second order in the interaction under its assumptions; it is not an exact identity after the factorization has been inserted. The relevant reservoir quantities are correlations
+
+$$
+C_{\alpha\beta}(\tau)=
+\operatorname{tr}_E[B_\alpha(\tau)B_\beta(0)\rho_E].
+$$
+
+Suppose these decay on a correlation time $\tau_B$. If the reduced state changes little during $\tau_B$, replace $\rho_I(t-\tau)$ by $\rho_I(t)$ inside the integral. For times well beyond the initial bath transient, extend its upper limit to infinity. This is the Markov approximation in the weak-coupling derivation. It replaces a memory integral by a generator depending on the state at the current time.
+
+A weakly coupled reservoir is not required to remain unentangled with the system at every instant. The Born approximation neglects the effect of accumulated correlations on the subsequent reduced dynamics to the order retained. An environment can receive information and energy while its local state near the system is effectively renewed by propagation into a large reservoir.
+
+### Rotating waves and secularization
+
+For a two-level transition at $\omega_0$, a dipole coupling contains both near-resonant terms $\sigma_+b_\omega$ and $\sigma_-b_\omega^\dagger$, and counter-rotating terms $\sigma_+b_\omega^\dagger$ and $\sigma_-b_\omega$. In the interaction picture the latter oscillate near $\omega_0+\omega$, while resonant exchange oscillates near $\omega_0-\omega$. Neglecting counter-rotating contributions is justified when $\omega_0$ greatly exceeds decay, detuning, and drive scales.
+
+A related but distinct approximation appears in deriving the generator. Decompose a system coupling operator into Bohr-frequency components,
+
+$$
+S_\alpha(\omega)=\sum_{\epsilon'-\epsilon=\omega}
+\Pi_\epsilon S_\alpha\Pi_{\epsilon'},
+\qquad [H_S,S_\alpha(\omega)]=-\omega S_\alpha(\omega).
+$$
+
+Products of different components carry factors $e^{i(\omega'-\omega)t}$. Dropping rapidly rotating terms with well-separated frequencies is the *secular approximation*. Near-degenerate transitions may have to remain grouped. A Born–Markov approximation without an appropriate secular or other positivity-preserving construction need not yield a completely positive equation. It is therefore too strong to say that weak coupling alone guarantees Lindblad form.
+
+For the optical limit in the review, one may choose a bandwidth $\xi$ and coarse-graining step $\Delta t$ satisfying
+
+$$
+\Omega,|\Delta|,\Gamma\ll \Delta t^{-1}\ll\xi\ll\omega_0.
+$$ {#eq-timescale-hierarchy}
+
+Equivalently, the step is long compared with the bath memory but short compared with the retained system dynamics. The numerical limit of very fine integration is taken *within the resulting effective model*; it does not assert that the microscopic approximation remains valid at arbitrarily short physical times.
+
+### When these approximations need attention
+
+A structured photonic density of states, a narrow cavity retained as an environment, slow collective excitations, a small bath, or strong coupling can invalidate a short-memory description. Strong interactions can also change the relevant transition frequencies and invalidate a dissipator derived for uncoupled sites. A phenomenological local loss model may still be useful, but its domain of validity must be stated rather than inferred from the algebraic form of its generator.
+
+For finite-temperature equilibrium reservoirs, upward and downward transition rates generally differ and obey detailed balance. They need not be equal, and a Hermitian density-dephasing jump is not a generic model of a low-temperature thermal reservoir. Driven reservoirs or measurement apparatus can produce dynamics that do not satisfy thermal detailed balance.
+
+## Complete positivity and the Lindblad generator {#sec-lindblad-generator}
+
+A physical channel preserves trace and positivity. It must also preserve positivity when an untouched auxiliary system is included. This stronger condition is *complete positivity*. A channel then has a Kraus representation
+
+$$
+\mathcal E(\rho)=\sum_aK_a\rho K_a^\dagger,
+\qquad \sum_aK_a^\dagger K_a=I.
+$$ {#eq-kraus-channel}
+
+The normalization identity gives trace preservation. Positivity follows because each $K_a\rho K_a^\dagger$ is positive for positive $\rho$; tensoring each Kraus operator with an identity establishes complete positivity as well.
+
+For a time-independent, continuous, completely positive trace-preserving semigroup on a finite-dimensional system, the most general generator has the Gorini–Kossakowski–Sudarshan–Lindblad form [@GKS1976; @Lindblad1976]:
+
+$$
+\dot\rho=\mathcal L\rho=-i[H,\rho]+\sum_m\mathcal D[L_m]\rho,
+\qquad
+\mathcal D[L]\rho=L\rho L^\dagger-\frac12\{L^\dagger L,\rho\}.
+$$ {#eq-lindblad-master}
+
+Here $H=H^\dagger$ includes any retained Lamb shift, and $\{A,B\}=AB+BA$. Infinite-dimensional oscillators require additional domain and boundedness care; finite occupation cutoffs used numerically make a concrete finite-dimensional problem, whose cutoff must then be checked.
+
+The infinitesimal Kraus operators are
+
+$$
+K_0=I-iH\,dt-\frac12\sum_mL_m^\dagger L_m\,dt,
+\qquad K_m=\sqrt{dt}\,L_m.
+$$ {#eq-infinitesimal-kraus}
+
+They satisfy $\sum_aK_a^\dagger K_a=I+O(dt^2)$. Substituting them into @eq-kraus-channel and retaining terms through $dt$ yields @eq-lindblad-master. This construction anticipates a trajectory: outcome zero is a no-count event; outcome $m$ is a count in channel $m$.
+
+### Trace, Hermiticity, and positivity
+
+Cyclicity of the trace gives
+
+$$
+\operatorname{tr}\mathcal D[L]\rho
+=\operatorname{tr}(L^\dagger L\rho)
+-\tfrac12\operatorname{tr}(L^\dagger L\rho)
+-\tfrac12\operatorname{tr}(\rho L^\dagger L)=0.
+$$
+
+Hermiticity is preserved because the Hamiltonian commutator has the required adjoint symmetry and each dissipator maps Hermitian operators to Hermitian operators. Complete positivity follows from the finite-time channel generated by this form, not from a finite forward-Euler step: applying $\rho\mapsto\rho+dt\,\mathcal L\rho$ at an excessively large $dt$ can produce negative eigenvalues.
+
+A useful alternative separates norm loss and recycling:
+
+$$
+H_{\mathrm{eff}}=H-\frac i2\sum_mL_m^\dagger L_m,
+\qquad
+\mathcal L\rho=-i(H_{\mathrm{eff}}\rho-\rho H_{\mathrm{eff}}^\dagger)
++\sum_mL_m\rho L_m^\dagger.
+$$ {#eq-effective-master}
+
+The non-Hermitian part removes probability from the no-count branch. Recycling puts it into branches associated with detected events. Dropping recycling describes a conditional, trace-decreasing process, not the unconditional master equation.
+
+## Observables and the adjoint equation {#sec-adjoint-generator}
+
+Instead of evolving $\rho$, one can evolve an observable's expectation. Define the adjoint generator by $\operatorname{tr}[A\mathcal L(\rho)]=\operatorname{tr}[(\mathcal L^\dagger A)\rho]$. Direct rearrangement gives
+
+$$
+\frac{d}{dt}\langle A\rangle
+=\left\langle i[H,A]
++\sum_m\left(L_m^\dagger A L_m-\frac12\{L_m^\dagger L_m,A\}\right)\right\rangle,
+$$ {#eq-adjoint-generator}
+
+for a time-independent $A$. Add $\langle\partial_tA\rangle$ if $A$ depends explicitly on time. A conserved quantity satisfies $\mathcal L^\dagger A=0$. This condition is more general than $[H,A]=0$.
+
+For particle loss with $L_j=\sqrt\gamma\,a_j$ and a number-conserving Hamiltonian,
+
+$$
+\frac{d}{dt}\langle N\rangle=-\gamma\langle N\rangle,
+\qquad \langle N(t)\rangle=e^{-\gamma t}\langle N(0)\rangle.
+$$
+
+The identity holds for interacting particles as long as all modes experience that one-body loss rate and no other term changes number. It does not imply that the remaining state stays thermal or coherent.
+
+For a Hermitian jump $L=\sqrt\gamma\,X$, its dissipator can be written
+
+$$
+\mathcal D[\sqrt\gamma X]\rho=-\frac\gamma2[X,[X,\rho]].
+$$ {#eq-double-commutator}
+
+If $X|x_a\rangle=x_a|x_a\rangle$, the dissipative contribution to a matrix element is
+
+$$
+\dot\rho_{ab}=-\frac\gamma2(x_a-x_b)^2\rho_{ab}.
+$$
+
+Thus eigenstates with equal $X$ eigenvalue are not distinguished by this channel, and coherence inside a degenerate eigenspace is preserved by this dissipator. This is the seed of a decoherence-free subspace.
+
+## Three elementary channels
+
+**Amplitude damping.** Let $L=\sqrt\Gamma\,\sigma_-$ with $\sigma_-=|g\rangle\langle e|$ and $H=0$. Then
+
+$$
+\dot\rho_{ee}=-\Gamma\rho_{ee},\qquad
+\dot\rho_{gg}=\Gamma\rho_{ee},\qquad
+\dot\rho_{eg}=-\frac\Gamma2\rho_{eg}.
+$$ {#eq-amplitude-damping}
+
+The population lifetime is $T_1=1/\Gamma$, whereas the coherence lifetime from relaxation alone is $T_2=2/\Gamma$. Additional dephasing shortens $T_2$.
+
+**Pure two-level dephasing.** Choosing $L=\sqrt{\gamma_\phi/2}\,\sigma_z$ makes $\dot\rho_{eg}=-\gamma_\phi\rho_{eg}$ while populations remain unchanged. The factor of one-half inside the square root is a convention chosen to make $\gamma_\phi$ the coherence decay rate. Choosing $\sqrt{\gamma_\phi}\sigma_z$ would instead produce rate $2\gamma_\phi$.
+
+**Damped oscillator.** A zero-temperature oscillator with $H=\omega a^\dagger a$ and $L=\sqrt\kappa a$ satisfies $d\langle a\rangle/dt=-(i\omega+\kappa/2)\langle a\rangle$ and $d\langle n\rangle/dt=-\kappa\langle n\rangle$. At thermal occupation $\bar n$, add $L_-=\sqrt{\kappa(\bar n+1)}a$ and $L_+=\sqrt{\kappa\bar n}\,a^\dagger$. The resulting occupation equation is $d\langle n\rangle/dt=-\kappa(\langle n\rangle-\bar n)$.
+
+## Steady states and dark states
+
+A steady state obeys $\mathcal L\rho_{\mathrm{ss}}=0$. If a normalized vector satisfies $L_m|D\rangle=0$ for every channel and $H|D\rangle=E_D|D\rangle$, then $|D\rangle\langle D|$ is stationary. Such a vector is a dark state for these jumps. This is a sufficient condition, not a classification of all pure steady states: a state can be an eigenvector with nonzero jump eigenvalue and still remain unchanged after a normalized jump.
+
+Finding one dark state does not establish that every initial condition approaches it. Other stationary sectors, conserved quantities, disconnected subspaces, or oscillating components may obstruct uniqueness or attraction. Dissipative state preparation requires both the desired steady state and a mechanism that removes undesired components.
+
+## Exercises
+
+1. **Check a dephasing convention.** For $L=\sqrt\gamma\,|e\rangle\langle e|$, find the population and coherence equations.
+
+   *Solution.* Both populations are unchanged by this channel, while $\dot\rho_{eg}=-(\gamma/2)\rho_{eg}$. Projector dephasing and Pauli dephasing therefore carry different rate factors.
+
+2. **Energy need not decrease.** Apply @eq-double-commutator to $H=(\Omega/2)\sigma_x$ and $X=\sigma_z$. Find $d\langle H\rangle/dt$ from dissipation alone.
+
+   *Solution.* Since $[\sigma_z,[\sigma_z,\sigma_x]]=4\sigma_x$, the answer is $-2\gamma\langle H\rangle$. A negative initial energy rises toward zero; a positive one falls toward zero.
+
+3. **Why positivity must be complete.** A map transposing a density matrix preserves its eigenvalues. Apply transpose on the first subsystem of $(|00\rangle+|11\rangle)/\sqrt2$ and diagonalize the result.
+
+   *Solution.* The partial transpose has eigenvalues $1/2,1/2,1/2,-1/2$. Ordinary positivity on isolated inputs is insufficient when entanglement with another system is possible.
+
+4. **Thermal balance.** For a two-level system with downward rate $\Gamma_\downarrow$ and upward rate $\Gamma_\uparrow$, derive the stationary excited population.
+
+   *Solution.* $\dot p_e=-\Gamma_\downarrow p_e+\Gamma_\uparrow(1-p_e)$, so $p_e^{\mathrm{ss}}=\Gamma_\uparrow/(\Gamma_\uparrow+\Gamma_\downarrow)$. A thermal bath imposes the additional relation $\Gamma_\uparrow/\Gamma_\downarrow=e^{-\beta\omega_0}$.

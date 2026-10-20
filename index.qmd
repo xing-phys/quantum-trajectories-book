@@ -1,6 +1,4 @@
----
-title: "Welcome"
----
+# Welcome {.unnumbered}
 
 ## A route from wavefunctions to open many-body physics {.unnumbered}
 

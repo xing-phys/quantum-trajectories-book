@@ -1,0 +1,158 @@
+# Engineering reservoirs to prepare quantum states {#sec-reservoir-engineering}
+
+Optical pumping prepares a spin by repeatedly exciting unwanted states and allowing spontaneous emission to remove their population. The target state is dark to the pumping cycle. Reservoir engineering applies the same logic to motional, entangled, or many-body states. This chapter develops Section V D of @Daley2014 and the trapped-ion example of Section V E. Its central questions are constructive: what jumps have the target as a dark state, why should other states reach it, and how long does the preparation take?
+
+## Darkness, uniqueness, and preparation are different claims
+
+If $L_\mu\ket{\Psi}=0$ for every channel and $H\ket{\Psi}=E\ket{\Psi}$, then
+$\rho_\Psi=\ket\Psi\bra\Psi$ is stationary. Substitution into the master equation proves this directly. A more general pure stationary state can be an eigenstate of each jump with nonzero eigenvalue, with a corresponding Hamiltonian compatibility condition. Dark states provide a particularly transparent sufficient construction.
+
+Being stationary does not imply being unique. Number conservation, parity, boundary modes, or disconnected components can leave several stationary sectors. Even a unique stationary state need not be reached rapidly as system size grows. For a finite-dimensional generator with eigenvalues $\lambda_\alpha$, a useful decay scale is the smallest nonzero $-\operatorname{Re}\lambda_\alpha$. Its system-size dependence, and the overlaps and possible nonnormal transients of the generator, matter for practical mixing times.
+
+One can associate positive operator
+
+$$
+H_{\mathrm{parent}}=\sum_\mu L_\mu^\dagger L_\mu
+$$
+
+with a dark-state construction. Its zero-energy vectors are exactly the common dark vectors. However, $H_{\mathrm{parent}}$ alone does not specify the recycling $L_\mu\rho L_\mu^\dagger$. Different jumps can have the same $L_\mu^\dagger L_\mu$ and different attractors. Showing a unique dark vector is therefore an important part of, but not in general a complete proof of, global relaxation. The systematic constructions of @Kraus2008 and @Verstraete2009 make this distinction precise.
+
+Entropy leaves the system through discarded bath degrees of freedom or reset ancillas. Work is often supplied by lasers or control gates. A reservoir-engineered stationary state consequently need not be a thermal equilibrium state of the bare Hamiltonian.
+
+## Replace photons by excitations of a reservoir gas
+
+Let atoms in an optical lattice interact with a second species forming a nearly uniform Bose–Einstein condensate. A density-density interaction has the form
+
+$$
+H_{SR}=g_{SR}\int d^3r\,n_S(\mathbf r)n_R(\mathbf r).
+$$
+
+Write the reservoir field as its condensate amplitude plus fluctuations. To leading order, its density contains Bogoliubov modes with dispersion
+
+$$
+E_k=\sqrt{\epsilon_k(\epsilon_k+2\mu_R)},
+\qquad \epsilon_k=\frac{k^2}{2m_R},
+\qquad S(k)=\frac{\epsilon_k}{E_k}.
+$$
+
+The system density can connect an excited lattice orbital to a lower one. Such a transition emits a reservoir excitation. Fermi's golden rule gives, schematically,
+
+$$
+W_{e\to g}=2\pi g_{SR}^2n_R
+\sum_{\mathbf k}S(k)|F_{eg}(\mathbf k)|^2
+\delta(\omega_{eg}-E_k),
+\qquad F_{eg}(\mathbf k)=\int d^3r\,w_g^*e^{i\mathbf k\cdot\mathbf r}w_e.
+$$ {#eq-reservoir-band-decay}
+
+The mode normalization converts the sum into an integral in a large bath. The structure factor $S(k)$ suppresses low-momentum density fluctuations. The form factor accounts for the orbital wavefunctions and recoil. A many-body jump then transfers a particle between motional states, for example $L_{q'q}=\sqrt{W_{q'q}}\,b_{0q'}^\dagger b_{1q}$; Bose enhancement or Pauli blocking follows from the creation and annihilation algebra.
+
+A useful regime is $k_BT_R\ll\mu_R\ll\omega_{eg}$. The emitted excitation then lies high above the bath's thermal population and is approximately particle-like. If it escapes or disperses rapidly, reverse absorption is weak and a Markov description can be justified. Lowest-band motion can meanwhile couple very weakly to the bath: energy and momentum conservation can fail to match its slow dispersion with that of the superfluid, and the low-energy reservoir structure factor is small. Thus one can arrange rapid interband relaxation without equally rapid heating of the desired low-band states [@Griessner2006; @Griessner2007]. This decoupling is a physical design requirement; it is not guaranteed merely by calling the second species a cold bath.
+
+## Dark-state cooling inside a band
+
+Interband decay by itself accumulates atoms in the lowest band, but does not necessarily select low quasimomentum *within* it. A Raman cycle can provide that selectivity:
+
+1. A momentum-selective coherent pulse excites atoms with large $|q|$ to a higher band while leaving a narrow region near $q=0$ dark.
+2. Bath-induced interband decay returns the excited atoms to the lowest band with a redistributed quasimomentum.
+3. Repetition moves population into the unexcited region, where it stops cycling.
+
+For a simple population model, let $p(q)$ be the excitation probability per cycle and $R(q'|q)$ the normalized return distribution. The low-band distribution changes according to
+
+$$
+f_{n+1}(q')=[1-p(q')]f_n(q')
++\int dq\,R(q'|q)p(q)f_n(q).
+$$
+
+If $p(q)=0$ in a target interval and every other momentum can eventually decay into that interval, probability accumulates there. Finite pulse duration, undesired residual excitation of the dark interval, and interactions set a practical limit. This simple model demonstrates the entropy-flow mechanism; it omits coherent pulse interference, quantum statistics, and collision-driven redistribution that a quantitative calculation may require.
+
+The final momentum width can correspond to a temperature below $T_R$ because this is a driven cooling cycle. The lasers promote small system energies to an interband energy that the bath can absorb without appreciable reverse excitation. Detailed balance with respect to the undriven lattice Hamiltonian does not apply. In a fermionic variant, cooling into occupied final states is blocked and can help produce robust filling patterns; reliable register loading then requires analysis of vacancies and the relevant state-dependent potentials.
+
+The review also describes register-loading proposals in which fermions enter an excited band and relax into target lattice states while creating particle-hole excitations in a surrounding reservoir. Pauli blocking prevents repeated filling of an already occupied target mode. Such a mechanism supplies error resistance for a specified loading task; its fidelity still depends on vacancy removal, reservoir occupation, and the suppression of reverse processes.
+
+## Condensation from local phase alignment
+
+A particularly instructive number-conserving jump on a bond is
+
+$$
+L_{ij}=\sqrt\kappa\,(b_i^\dagger+b_j^\dagger)(b_i-b_j).
+$$ {#eq-reservoir-bond}
+
+Define symmetric and antisymmetric bond modes $s=(b_i+b_j)/\sqrt2$ and $a=(b_i-b_j)/\sqrt2$. Then $L_{ij}=2\sqrt\kappa\,s^\dagger a$. It removes antisymmetric occupation and puts a particle into the symmetric mode. The bath therefore repairs a phase difference rather than measuring density independently at both sites. The total particle number is conserved.
+
+On a lattice of $M$ sites define $B_0^\dagger=M^{-1/2}\sum_i b_i^\dagger$. The fixed-number condensate is
+
+$$
+\ket{\mathrm{BEC}_N}=\frac{(B_0^\dagger)^N}{\sqrt{N!}}\ket{\mathrm{vac}}.
+$$ {#eq-reservoir-bec}
+
+Since $[b_i-b_j,B_0^\dagger]=0$ and $(b_i-b_j)\ket{\mathrm{vac}}=0$, every bond jump annihilates this state. On a connected graph the requirement of equal amplitudes on every bond singles out the uniform orbital. Within a fixed-$N$ sector, the ideal dissipative construction drives condensation into it [@Diehl2008; @Kraus2008]. If a Hamiltonian is present, this state must also be compatible with that Hamiltonian. Uniform nearest-neighbor hopping on a regular periodic lattice has it as an eigenstate; a general irregular graph or an inhomogeneous trap need not.
+
+There is no contradiction with $\langle b_i\rangle=0$ in a fixed-number state. Condensation is diagnosed by an eigenvalue of order $N$ in the matrix $\langle b_i^\dagger b_j\rangle$, which here equals $N/M$ for all $i,j$. Broken-symmetry mean-field amplitudes offer a useful alternative description, but are not necessary for the number-conserving construction.
+
+With repulsive on-site interactions, $H_U\ket{\mathrm{BEC}_N}$ is generally not proportional to $\ket{\mathrm{BEC}_N}$. Coherent interactions create fluctuations that the bond reservoir attempts to remove. Their competition can produce a mixed stationary state and dissipative phase transitions. An effective temperature can describe some long-wavelength fluctuations in specified regimes; it is not automatically a thermodynamic temperature for every observable. Determining critical behavior requires fluctuations beyond simple mean field, finite-size scaling, and the symmetries and noise structure of the actual generator [@Daley2014; @Muller2012].
+
+## Pairing, antiferromagnetism, and what is being prepared
+
+The dark-state strategy also targets fermionic order. On a bipartite lattice, define the staggered pair creator
+
+$$
+\eta^\dagger=\sum_j(-1)^j c_{j\uparrow}^\dagger c_{j\downarrow}^\dagger.
+$$
+
+States proportional to $(\eta^\dagger)^P\ket{\mathrm{vac}}$ have coherent on-site pairs with alternating phase. Engineered quasi-local processes can select such $\eta$-pairing states [@Diehl2008; @Kraus2008]. They are special coherent states of a lattice model; their preparation is not equivalent to cooling into the generic repulsive Hubbard ground state.
+
+Here $(-1)^j$ denotes opposite signs on the two sublattices, rather than a choice of geometric coordinate in a general lattice.
+
+A general paired-state construction is easy to see in momentum space. For real $u_k,v_k$ with $u_k^2+v_k^2=1$, the two-mode state
+$\ket{\psi_k}=u_k\ket{00}+v_kc_k^\dagger c_{-k}^\dagger\ket{00}$ is annihilated by
+
+$$
+\beta_k=u_kc_k-v_kc_{-k}^\dagger,
+\qquad
+\beta_{-k}=u_kc_{-k}+v_kc_k^\dagger.
+$$
+
+Taking $L_k\propto\beta_k$ damps Bogoliubov quasiparticles and makes a product of these paired states dark. This example allows particle exchange with a reservoir and is a conceptual illustration. Atomic proposals also construct *number-conserving*, quasi-local bilinear jumps whose common dark states have pairing or antiferromagnetic correlations. The proposed $d$-wave constructions exploit fermionic statistics and optical pumping, without requiring an attractive conservative interaction to supply their pairing mechanism [@Diehl2010Pairing]. Demonstrating a target for designed jumps does not imply that arbitrary spontaneous emission generates that target.
+
+Topological preparation adds another requirement: distinguish the topology of a stationary covariance matrix or many-body state from the damping spectrum of its generator. In engineered one-dimensional fermion wires, dissipative bulk pairing can leave Majorana edge degrees of freedom isolated by a finite bulk damping gap [@Diehl2011]. Those edge modes usually imply a stationary *subspace*, not a unique global pure state. Boundary conditions, fermion parity, allowed local perturbations, and unwanted particle exchange affect the encoded information. More general mixed-state classifications require a purity structure in addition to damping, and a bulk damping gap by itself is not a universal proof of topological protection [@Bardyn2013]. These are theoretical constructions with specified reservoir couplings, not claims that generic losses create protected quantum memories.
+
+## Digital reservoirs and stabilizer pumping with trapped ions
+
+A reservoir need not be a large equilibrium medium. One can couple system qubits to an ancilla, transfer unwanted information to it, and reset it by optical pumping. Discarding and resetting the ancilla implements a completely positive map. Repeating a weak map can approximate a Lindblad generator; a finite-strength map is a valid digital dissipative operation without taking that limit. Trapped-ion experiments demonstrated this combination of coherent gates and dissipative maps [@Barreiro2011].
+
+For a concrete example, prepare the Bell state
+$\ket{\Phi^+}=(\ket{00}+\ket{11})/\sqrt2$.
+It is the simultaneous $+1$ eigenstate of commuting stabilizers
+$S_z=Z_1Z_2$ and $S_x=X_1X_2$. Define
+
+$$
+L_z=\sqrt\kappa\,X_1\frac{1-S_z}{2},
+\qquad
+L_x=\sqrt\kappa\,Z_2\frac{1-S_x}{2}.
+$$ {#eq-reservoir-bell-jumps}
+
+The projector in $L_z$ selects the undesired $S_z=-1$ sector, and $X_1$ flips it into $S_z=+1$. It preserves $S_x$. Similarly $L_x$ repairs $S_x$ and preserves $S_z$. Both annihilate $\ket{\Phi^+}$. Since the two desired stabilizer eigenvalues identify a single state, every Bell-basis population is pumped toward it, and the same dissipative process removes unwanted coherences. This construction makes the role of the ancilla reset explicit: it removes the entropy associated with an incorrect stabilizer eigenvalue.
+
+For larger stabilizer codes, compatible correction operators, boundary conditions, and logical degeneracy require separate analysis. A reservoir may stabilize a code space while preserving its logical information, but local pumping does not automatically provide fault tolerance against arbitrary errors. The review's connections to dissipative quantum computation and memories are design principles whose scalability depends on those additional constraints [@Verstraete2009; @Muller2012].
+
+## Exercises with worked guidance
+
+1. **Check the bond dark state.** Verify @eq-reservoir-bec directly for $N=2$ on two sites.
+
+   *Solution.* The normalized state is $(\ket{20}+\sqrt2\ket{11}+\ket{02})/2$. Applying $b_1-b_2$ gives zero; consequently the complete jump gives zero.
+
+2. **Stationary does not imply attractive.** Compare jumps $L=\sqrt\kappa Z$ and $L=\sqrt\kappa\ket0\bra1$ for one qubit.
+
+   *Solution.* The first dephases and leaves every diagonal state stationary; the second pumps every initial state into $\ket0$. Finding a stationary pure vector alone would not reveal this difference.
+
+3. **Hamiltonian compatibility.** Does an ideal fixed-number condensate on two sites remain stationary under $H_U=U[n_1(n_1-1)+n_2(n_2-1)]/2$ when $N=2$ and $U\ne0$?
+
+   *Solution.* The $\ket{20}$ and $\ket{02}$ components acquire energy $U$, while $\ket{11}$ has energy zero. The state is no longer a Hamiltonian eigenstate, so the dark-state proof of stationarity fails.
+
+4. **A stabilizer repair.** Show that $X_1(1-Z_1Z_2)/2$ maps $\ket{01}$ to $\ket{11}$ and annihilates $\ket{00}$. Does that jump alone prepare a Bell state?
+
+   *Solution.* It repairs parity but leaves a two-dimensional even-parity dark space. The second stabilizer pump is needed to fix its coherent superposition.
+
+5. **Below the bath temperature.** Identify the source of work and sink of entropy in the Raman dark-state cycle.
+
+   *Solution.* The Raman fields supply work and energy selectivity. Escaping reservoir excitations carry energy and entropy. The target is protected from reverse transitions by spectral and dark-state selectivity, so its width is not fixed by thermal detailed balance with the undriven bath.
